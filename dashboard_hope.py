@@ -73,7 +73,7 @@ def get_logo_b64(path):
     except FileNotFoundError:
         return ""
 
-LOGO_PATH = r"C:\Users\bmond\Downloads\hope_logo.jpg"
+LOGO_PATH = r"hope_logo.jpg"
 logo_b64  = get_logo_b64(LOGO_PATH)
 
 

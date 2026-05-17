@@ -1,70 +1,96 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 import base64
 from datetime import datetime
-
+ 
 # ─── CONFIG ────────────────────────────────────────────────────────────────────
-st.set_page_config(
-    page_title="HOPE – CRM",
-    page_icon="🐴",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
+st.set_page_config(page_title="HOPE – CRM", page_icon="🐴", layout="wide", initial_sidebar_state="expanded")
+ 
 ROSE       = "#E8186D"
 ROSE_LIGHT = "#F5559A"
 NOIR       = "#1A0A00"
 GRIS_FOND  = "#F9F4F6"
 BLANC      = "#FFFFFF"
 GRIS_TEXT  = "#5C3D4A"
-
+ 
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap');
-    .stApp {{ background-color: {GRIS_FOND}; font-family: 'DM Sans', sans-serif; }}
-    [data-testid="stSidebar"] {{ background-color: {NOIR} !important; border-right: 3px solid {ROSE}; }}
-    [data-testid="stSidebar"] * {{ color: {BLANC} !important; }}
+    .stApp {{ background-color:{GRIS_FOND}; font-family:'DM Sans',sans-serif; }}
+    [data-testid="stSidebar"] {{ background-color:{NOIR} !important; border-right:3px solid {ROSE}; }}
+    [data-testid="stSidebar"] * {{ color:{BLANC} !important; }}
     h1,h2,h3 {{ font-family:'Playfair Display',serif !important; color:{NOIR} !important; }}
-
     .header-band {{ background:linear-gradient(90deg,{NOIR} 60%,{ROSE} 100%); border-radius:18px; padding:24px 32px; color:white; margin-bottom:28px; display:flex; align-items:center; gap:20px; }}
     .header-title {{ font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:white; }}
     .header-sub {{ font-size:0.9rem; opacity:0.75; margin-top:4px; }}
-
     .section-title {{ font-family:'Playfair Display',serif; font-size:1.3rem; color:{NOIR}; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid {ROSE}; display:inline-block; }}
     .kpi-card {{ background:{BLANC}; border-radius:14px; padding:20px; box-shadow:0 2px 12px rgba(232,24,109,0.08); border-left:5px solid {ROSE}; margin-bottom:12px; }}
     .kpi-number {{ font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:900; color:{ROSE}; line-height:1; }}
     .kpi-label {{ font-size:0.82rem; color:{GRIS_TEXT}; margin-top:4px; text-transform:uppercase; letter-spacing:0.08em; }}
-
     .rank-item {{ background:rgba(255,255,255,0.07); border-radius:10px; padding:8px 12px; margin-bottom:7px; display:flex; align-items:center; gap:10px; }}
     .rank-avatar {{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0; }}
-    .rank-medal {{ font-size:1.1rem; min-width:22px; }}
-
     .data-table {{ width:100%; border-collapse:collapse; font-family:'DM Sans',sans-serif; font-size:0.88rem; }}
     .data-table th {{ background:{NOIR}; color:white; padding:10px 14px; text-align:left; font-weight:500; }}
     .data-table td {{ padding:10px 14px; border-bottom:1px solid #f0e8ec; }}
     .data-table tr:hover td {{ background:#fdf5f8; }}
-    .badge-wa {{ background:#25D366; color:white; font-size:0.68rem; padding:2px 8px; border-radius:20px; margin-left:6px; }}
-    .badge-inscrit {{ background:#d4edda; color:#155724; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
-    .badge-attente {{ background:#fff3cd; color:#856404; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
-    .badge-mecene {{ background:#e8d5f5; color:#5b2d8e; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-wa       {{ background:#25D366; color:white; font-size:0.68rem; padding:2px 8px; border-radius:20px; }}
+    .badge-inscrit  {{ background:#d4edda; color:#155724; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-attente  {{ background:#fff3cd; color:#856404; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-mecene   {{ background:#e8d5f5; color:#5b2d8e; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
     .badge-benevole {{ background:#d0eaff; color:#0a4a8c; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
     .badge-beneficiaire {{ background:#fde8f0; color:#8c0a3c; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
-
+    .badge-regulier  {{ background:#1a3a6b; color:white; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-evenement {{ background:#7c3aed; color:white; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-externe   {{ background:#374151; color:white; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-potentiel {{ background:{ROSE}; color:white; font-size:0.68rem; padding:2px 8px; border-radius:20px; }}
+    .badge-actif    {{ background:#d4edda; color:#155724; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
+    .badge-inactif  {{ background:#f8d7da; color:#721c24; font-size:0.72rem; padding:2px 8px; border-radius:20px; }}
     .action-card {{ background:{BLANC}; border-radius:14px; padding:20px 24px; box-shadow:0 1px 10px rgba(0,0,0,0.06); margin-bottom:16px; border-left:4px solid {ROSE_LIGHT}; }}
     .action-title {{ font-weight:700; font-size:0.95rem; color:{NOIR}; margin-bottom:10px; }}
     .wa-source {{ background:rgba(37,211,102,0.1); border:1px solid #25D366; border-radius:8px; padding:8px 14px; font-size:0.82rem; color:#1a8a45; margin-bottom:16px; display:flex; align-items:center; gap:8px; }}
     .sidebar-sep {{ border:none; border-top:1px solid rgba(255,255,255,0.15); margin:14px 0; }}
-    .newsletter-zone {{ background: linear-gradient(135deg, #fff5f9 0%, #fff 100%); border: 2px dashed {ROSE_LIGHT}; border-radius: 14px; padding: 28px 24px; text-align: center; margin-bottom: 16px; }}
-    .newsletter-icon {{ font-size: 2.5rem; margin-bottom: 8px; }}
-    .stat-row {{ display:flex; gap:12px; margin-bottom:20px; }}
+    .newsletter-hero {{ background:linear-gradient(135deg,{ROSE} 0%,{NOIR} 100%); border-radius:18px; padding:36px 32px; color:white; text-align:center; margin-bottom:24px; }}
+    .newsletter-hero h2 {{ color:white !important; font-size:1.8rem; margin-bottom:8px; }}
+    .newsletter-zone {{ background:#fff5f9; border:2px dashed {ROSE_LIGHT}; border-radius:14px; padding:24px; text-align:center; margin-bottom:16px; }}
+    .stat-row {{ display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }}
     .stat-chip {{ background:{BLANC}; border-radius:10px; padding:12px 18px; flex:1; text-align:center; box-shadow:0 1px 8px rgba(232,24,109,0.07); border-top:3px solid {ROSE}; }}
     .stat-chip-num {{ font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:{ROSE}; }}
     .stat-chip-label {{ font-size:0.75rem; color:{GRIS_TEXT}; text-transform:uppercase; letter-spacing:0.06em; }}
+    .antenne-card {{ background:{BLANC}; border-radius:16px; padding:24px; box-shadow:0 2px 14px rgba(232,24,109,0.08); margin-bottom:16px; border-top:4px solid {ROSE}; }}
+    .transcript-block {{ background:#f8f4ff; border-radius:12px; padding:18px 20px; margin-bottom:12px; border-left:4px solid #7c3aed; font-size:0.85rem; line-height:1.7; color:#2d1a4a; }}
+    .vocal-block {{ background:#fff8e1; border-radius:12px; padding:18px 20px; margin-bottom:12px; border-left:4px solid #f59e0b; font-size:0.85rem; line-height:1.7; }}
+    .info-importante {{ background:#fde8f0; border-radius:10px; padding:12px 16px; margin-bottom:10px; border-left:4px solid {ROSE}; font-size:0.85rem; }}
+    .mail-compose {{ background:{BLANC}; border-radius:14px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.07); }}
+    .photo-card {{ background:{BLANC}; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.08); }}
+    .tool-card {{ background:{BLANC}; border-radius:14px; padding:20px; box-shadow:0 2px 12px rgba(232,24,109,0.07); border-top:3px solid {ROSE}; text-align:center; cursor:pointer; transition:transform 0.15s; }}
+    .tool-card:hover {{ transform:translateY(-2px); box-shadow:0 4px 20px rgba(232,24,109,0.14); }}
+    .tool-icon {{ font-size:2rem; margin-bottom:8px; }}
+    .tool-name {{ font-weight:700; font-size:0.9rem; color:{NOIR}; }}
+    .tool-desc {{ font-size:0.78rem; color:{GRIS_TEXT}; margin-top:4px; }}
+    .tool-card-newsletter {{ background:linear-gradient(135deg,{ROSE} 0%,{NOIR} 100%); border-radius:18px; padding:28px 24px; box-shadow:0 4px 20px rgba(232,24,109,0.22); text-align:center; cursor:pointer; }}
+    .tool-card-newsletter .tool-icon {{ font-size:3rem; }}
+    .tool-card-newsletter .tool-name {{ color:white; font-size:1.2rem; font-family:'Playfair Display',serif; }}
+    .tool-card-newsletter .tool-desc {{ color:rgba(255,255,255,0.75); font-size:0.88rem; margin-top:6px; }}
+    .profil-badge {{ background:{ROSE}; color:white; font-size:0.75rem; padding:3px 12px; border-radius:20px; font-weight:600; }}
+    .ant-section {{ font-weight:700; font-size:0.95rem; color:{ROSE}; margin:18px 0 8px; border-left:4px solid {ROSE}; padding-left:10px; }}
+    .parcours-tag {{ font-size:0.7rem; background:#f0fdf4; color:#166534; border:1px solid #86efac; padding:2px 7px; border-radius:20px; margin-left:6px; }}
+    .parcours-ext  {{ font-size:0.7rem; background:#f0f4ff; color:#1e3a8a; border:1px solid #93c5fd; padding:2px 7px; border-radius:20px; margin-left:6px; }}
+    .potentiel-banner {{ background:linear-gradient(90deg,#fde8f0,#fff); border:1px solid {ROSE_LIGHT}; border-radius:10px; padding:10px 16px; margin-bottom:14px; font-size:0.85rem; color:{NOIR}; display:flex; align-items:center; gap:10px; }}
+    .antenne-respo-card {{ background:{BLANC}; border-radius:14px; padding:18px 20px; box-shadow:0 2px 10px rgba(232,24,109,0.07); border-left:5px solid {ROSE}; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }}
+    .antenne-respo-info {{ display:flex; flex-direction:column; gap:4px; }}
+    .antenne-respo-name {{ font-weight:700; font-size:1rem; color:{NOIR}; }}
+    .antenne-respo-ant {{ font-size:0.8rem; color:{GRIS_TEXT}; }}
+    .antenne-respo-actions {{ display:flex; gap:8px; }}
+    .btn-mail {{ background:{ROSE}; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px; }}
+    .btn-tel {{ background:{NOIR}; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px; }}
+    .newsletter-compose-card {{ background:{BLANC}; border-radius:16px; padding:28px; box-shadow:0 2px 14px rgba(232,24,109,0.09); border-top:4px solid {ROSE}; }}
+    .contacts-panel {{ background:{GRIS_FOND}; border-radius:14px; padding:18px; border:1px solid #f0dde6; }}
 </style>
 """, unsafe_allow_html=True)
-
-
+ 
+ 
 # ─── LOGO ──────────────────────────────────────────────────────────────────────
 def get_logo_b64(path):
     try:
@@ -72,409 +98,720 @@ def get_logo_b64(path):
             return base64.b64encode(f.read()).decode()
     except FileNotFoundError:
         return ""
-
+ 
 LOGO_PATH = r"hope_logo.jpg"
 logo_b64  = get_logo_b64(LOGO_PATH)
-
-
+ 
 # ─── DONNÉES ───────────────────────────────────────────────────────────────────
+antennes = ["Paris – Île-de-France", "Lyon – Auvergne-Rhône-Alpes", "Marseille – PACA", "Bordeaux – Nouvelle-Aquitaine", "Rennes – Bretagne"]
+ 
 centres = {
-    "Île-de-France":            ["Centre Équestre de Versailles", "Poney Club de Vincennes", "Écuries du Bois de Boulogne"],
-    "Provence-Alpes-Côte d'Azur": ["Centre Équestre d'Aix-en-Provence", "Haras de Marseille"],
-    "Nouvelle-Aquitaine":       ["Centre Équestre de Bordeaux", "Poney Club de Bayonne"],
-    "Occitanie":                ["Écuries de Montpellier", "Centre Équestre de Toulouse"],
-    "Bretagne":                 ["Centre Équestre de Rennes", "Haras de Brest"],
+    "Paris – Île-de-France":           ["Centre Équestre de Versailles", "Poney Club de Vincennes", "Écuries du Bois de Boulogne"],
+    "Lyon – Auvergne-Rhône-Alpes":     ["Centre Équestre de Lyon", "Haras de Villeurbanne"],
+    "Marseille – PACA":                ["Centre Équestre d'Aix-en-Provence", "Haras de Marseille"],
+    "Bordeaux – Nouvelle-Aquitaine":   ["Centre Équestre de Bordeaux", "Poney Club de Bayonne"],
+    "Rennes – Bretagne":               ["Centre Équestre de Rennes", "Haras de Brest"],
 }
-
+ 
+# Responsables par antenne avec mail et téléphone
+respos_antenne = [
+    {"nom":"Annabelle Marchand","antenne":"Paris – Île-de-France",         "mail":"annabelle.marchand@association-hope.fr","tel":"06 12 34 56 78","emoji":"🗼"},
+    {"nom":"Gilles Tournebrise", "antenne":"Lyon – Auvergne-Rhône-Alpes",  "mail":"gilles.tournebrise@association-hope.fr","tel":"06 23 45 67 89","emoji":"🦁"},
+    {"nom":"Sandrine Azoulay",   "antenne":"Marseille – PACA",             "mail":"sandrine.azoulay@association-hope.fr", "tel":"06 34 56 78 90","emoji":"🌊"},
+    {"nom":"Emeline Courtet",    "antenne":"Bordeaux – Nouvelle-Aquitaine","mail":"emeline.courtet@association-hope.fr",  "tel":"06 45 67 89 01","emoji":"🍷"},
+    {"nom":"(En cours)",         "antenne":"Rennes – Bretagne",            "mail":"rennes@association-hope.fr",           "tel":"—",            "emoji":"⚓"},
+]
+ 
+antennes_data = [
+    {"nom":"Paris – Île-de-France",         "emoji":"🗼","description":"Antenne historique fondée en 2015, la plus grande avec 3 centres partenaires.","localisation":"Paris 75, 92, 93, 94","membres":["Annabelle (Resp.)","Marie D.","Claire B.","Sophie R.","Laurence P.","Nathalie V."],"couleur":ROSE},
+    {"nom":"Lyon – Auvergne-Rhône-Alpes",   "emoji":"🦁","description":"Créée en 2018, très active sur les séjours découverte.","localisation":"Lyon 69, Villeurbanne","membres":["Gilles (Coord.)","Thomas M.","Julie R.","Marc S."],"couleur":"#1D9E75"},
+    {"nom":"Marseille – PACA",              "emoji":"🌊","description":"Ouverte en 2019. Forte dynamique associative et nombreux partenariats.","localisation":"Marseille 13, Aix-en-Provence","membres":["Sandrine (Sec.)","Lucas P.","Nadia E.","Karim B."],"couleur":"#378ADD"},
+    {"nom":"Bordeaux – Nouvelle-Aquitaine", "emoji":"🍷","description":"Antenne en pleine croissance (2021), forte présence rurale.","localisation":"Bordeaux 33, Bayonne 64","membres":["Emeline (Coord.)","Pauline D.","Romain F."],"couleur":"#BA7517"},
+    {"nom":"Rennes – Bretagne",             "emoji":"⚓","description":"Dernière antenne ouverte (2023), focus journées découverte.","localisation":"Rennes 35, Brest 29","membres":["En cours de constitution"],"couleur":"#7c3aed"},
+]
+ 
+# Données réalistes : asso proche de 1M€ de dons, centaines de bénévoles
 beneficiaires_data = [
-    {"Prénom":"Emma",  "Nom":"Laurent",  "Téléphone":"06 12 34 56 78","Séjour":"Été 2025",      "Centre":"Centre Équestre de Versailles",    "Mail":"emma.l@mail.com",  "Source":"WhatsApp"},
-    {"Prénom":"Noah",  "Nom":"Bernard",  "Téléphone":"06 23 45 67 89","Séjour":"Printemps 2025","Centre":"Poney Club de Vincennes",           "Mail":"",                 "Source":"WhatsApp"},
-    {"Prénom":"Chloé", "Nom":"Martin",   "Téléphone":"06 34 56 78 90","Séjour":"Été 2025",      "Centre":"Centre Équestre d'Aix-en-Provence", "Mail":"chloe.m@mail.com", "Source":"WhatsApp"},
-    {"Prénom":"Hugo",  "Nom":"Dupont",   "Téléphone":"06 45 67 89 01","Séjour":"Hiver 2025",    "Centre":"Centre Équestre de Versailles",    "Mail":"",                 "Source":"WhatsApp"},
-    {"Prénom":"Léa",   "Nom":"Rousseau", "Téléphone":"06 56 78 90 12","Séjour":"Été 2025",      "Centre":"Écuries du Bois de Boulogne",      "Mail":"lea.r@mail.com",   "Source":"WhatsApp"},
-    {"Prénom":"Tom",   "Nom":"Petit",    "Téléphone":"06 67 89 01 23","Séjour":"Printemps 2025","Centre":"Haras de Marseille",                "Mail":"tom.p@mail.com",   "Source":"WhatsApp"},
+    {"Prénom":"Emma",      "Nom":"Laurent",    "Téléphone":"06 12 34 56 78","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"emma.l@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
+    {"Prénom":"Chloé",     "Nom":"Martin",     "Téléphone":"06 34 56 78 90","Séjour":"Été 2025",      "Antenne":"Marseille – PACA",               "Mail":"chloe.m@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Léa",       "Nom":"Rousseau",   "Téléphone":"06 56 78 90 12","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"lea.r@mail.com",      "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Inès",      "Nom":"Dubois",     "Téléphone":"06 78 90 12 34","Séjour":"Printemps 2025","Antenne":"Lyon – Auvergne-Rhône-Alpes",    "Mail":"ines.d@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
+    {"Prénom":"Camille",   "Nom":"Perrin",     "Téléphone":"06 89 01 23 45","Séjour":"Hiver 2025",    "Antenne":"Bordeaux – Nouvelle-Aquitaine",  "Mail":"",                    "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Zoé",       "Nom":"Fontaine",   "Téléphone":"06 90 12 34 56","Séjour":"Été 2025",      "Antenne":"Rennes – Bretagne",              "Mail":"zoe.f@mail.com",      "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Sarah",     "Nom":"Benali",     "Téléphone":"06 11 22 33 44","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"sarah.b@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Jade",      "Nom":"Chevalier",  "Téléphone":"06 22 33 44 55","Séjour":"Printemps 2025","Antenne":"Lyon – Auvergne-Rhône-Alpes",    "Mail":"jade.c@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
+    {"Prénom":"Manon",     "Nom":"Lefebvre",   "Téléphone":"06 33 44 55 66","Séjour":"Hiver 2025",    "Antenne":"Marseille – PACA",               "Mail":"manon.l@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Ambre",     "Nom":"Dupré",      "Téléphone":"06 44 55 66 77","Séjour":"Été 2025",      "Antenne":"Bordeaux – Nouvelle-Aquitaine",  "Mail":"ambre.d@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Yasmine",   "Nom":"Ait Hamou",  "Téléphone":"06 55 66 77 88","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"yasmine.a@mail.com",  "Source":"WhatsApp","Potentielle_benv":"Oui"},
+    {"Prénom":"Lola",      "Nom":"Girard",     "Téléphone":"06 66 77 88 99","Séjour":"Printemps 2025","Antenne":"Rennes – Bretagne",              "Mail":"lola.g@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
 ]
-
+ 
 benevoles_data = [
-    {"Prénom":"Marie",  "Nom":"Dupont",  "Téléphone":"06 11 22 33 44","Mail":"marie.d@mail.com",  "Centre":"Centre Équestre de Versailles","Statut":"Actif"},
-    {"Prénom":"Thomas", "Nom":"Martin",  "Téléphone":"06 22 33 44 55","Mail":"thomas.m@mail.com", "Centre":"Poney Club de Vincennes",      "Statut":"Relance"},
-    {"Prénom":"Claire", "Nom":"Bernard", "Téléphone":"06 33 44 55 66","Mail":"claire.b@mail.com", "Centre":"Centre Équestre de Versailles","Statut":"Actif"},
-    {"Prénom":"Lucas",  "Nom":"Petit",   "Téléphone":"06 44 55 66 77","Mail":"lucas.p@mail.com",  "Centre":"Haras de Marseille",           "Statut":"Inactif"},
-    {"Prénom":"Sophie", "Nom":"Roux",    "Téléphone":"06 55 66 77 88","Mail":"sophie.r@mail.com", "Centre":"Écuries du Bois de Boulogne",  "Statut":"Actif"},
+    {"Prénom":"Marie",     "Nom":"Dupont",     "Téléphone":"06 11 22 33 44","Mail":"marie.d@mail.com",     "Antenne":"Paris – Île-de-France",         "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Thomas",    "Nom":"Martin",     "Téléphone":"06 22 33 44 55","Mail":"thomas.m@mail.com",    "Antenne":"Lyon – Auvergne-Rhône-Alpes",   "Type":"Régulier",     "Statut":"Relance", "Parcours":"Recrutement externe"},
+    {"Prénom":"Claire",    "Nom":"Bernard",    "Téléphone":"06 33 44 55 66","Mail":"claire.b@mail.com",    "Antenne":"Paris – Île-de-France",         "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Lucas",     "Nom":"Petit",      "Téléphone":"06 44 55 66 77","Mail":"lucas.p@mail.com",     "Antenne":"Marseille – PACA",              "Type":"Événementiel", "Statut":"Inactif", "Parcours":"Recrutement externe"},
+    {"Prénom":"Sophie",    "Nom":"Roux",       "Téléphone":"06 55 66 77 88","Mail":"sophie.r@mail.com",    "Antenne":"Paris – Île-de-France",         "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Emeline",   "Nom":"Cours",      "Téléphone":"06 66 77 88 99","Mail":"emeline.c@mail.com",   "Antenne":"Bordeaux – Nouvelle-Aquitaine", "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Julie",     "Nom":"Renard",     "Téléphone":"06 77 88 99 00","Mail":"julie.r@mail.com",     "Antenne":"Lyon – Auvergne-Rhône-Alpes",  "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Paul",      "Nom":"Lefort",     "Téléphone":"06 88 99 00 11","Mail":"paul.l@mail.com",      "Antenne":"Rennes – Bretagne",             "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Nadia",     "Nom":"El Amri",    "Téléphone":"06 99 00 11 22","Mail":"nadia.e@mail.com",     "Antenne":"Marseille – PACA",              "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Laura",     "Nom":"Schneider",  "Téléphone":"06 10 20 30 40","Mail":"laura.s@mail.com",     "Antenne":"Paris – Île-de-France",         "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Karim",     "Nom":"Boussaid",   "Téléphone":"06 20 30 40 50","Mail":"karim.b@mail.com",     "Antenne":"Marseille – PACA",              "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Agathe",    "Nom":"Vidal",      "Téléphone":"06 30 40 50 60","Mail":"agathe.v@mail.com",    "Antenne":"Lyon – Auvergne-Rhône-Alpes",  "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Romain",    "Nom":"Faure",      "Téléphone":"06 40 50 60 70","Mail":"romain.f@mail.com",    "Antenne":"Bordeaux – Nouvelle-Aquitaine", "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Élise",     "Nom":"Morin",      "Téléphone":"06 50 60 70 80","Mail":"elise.m@mail.com",     "Antenne":"Paris – Île-de-France",         "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Damien",    "Nom":"Leclercq",   "Téléphone":"06 60 70 80 90","Mail":"damien.l@mail.com",    "Antenne":"Rennes – Bretagne",             "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Fatima",    "Nom":"Zouaoui",    "Téléphone":"06 70 80 90 01","Mail":"fatima.z@mail.com",    "Antenne":"Paris – Île-de-France",         "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Hugo",      "Nom":"Bertrand",   "Téléphone":"06 80 90 01 12","Mail":"hugo.b@mail.com",      "Antenne":"Lyon – Auvergne-Rhône-Alpes",  "Type":"Événementiel", "Statut":"Relance", "Parcours":"Recrutement externe"},
+    {"Prénom":"Pauline",   "Nom":"Deschamps",  "Téléphone":"06 90 01 12 23","Mail":"pauline.d@mail.com",   "Antenne":"Bordeaux – Nouvelle-Aquitaine", "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Marc",      "Nom":"Souchard",   "Téléphone":"06 01 12 23 34","Mail":"marc.s@mail.com",      "Antenne":"Lyon – Auvergne-Rhône-Alpes",  "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Nathalie",  "Nom":"Vasseur",    "Téléphone":"06 11 23 34 45","Mail":"nathalie.v@mail.com",  "Antenne":"Paris – Île-de-France",         "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Antoine",   "Nom":"Gimenez",    "Téléphone":"06 21 34 45 56","Mail":"antoine.g@mail.com",   "Antenne":"Marseille – PACA",              "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Coralie",   "Nom":"Blanc",      "Téléphone":"06 31 45 56 67","Mail":"coralie.b@mail.com",   "Antenne":"Rennes – Bretagne",             "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Sébastien", "Nom":"Marchal",    "Téléphone":"06 41 56 67 78","Mail":"sebastien.m@mail.com", "Antenne":"Paris – Île-de-France",         "Type":"Régulier",     "Statut":"Actif",   "Parcours":"Recrutement externe"},
+    {"Prénom":"Iris",      "Nom":"Legrand",    "Téléphone":"06 51 67 78 89","Mail":"iris.l@mail.com",      "Antenne":"Bordeaux – Nouvelle-Aquitaine", "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Ancienne bénéficiaire"},
+    {"Prénom":"Théo",      "Nom":"Roussel",    "Téléphone":"06 61 78 89 90","Mail":"theo.r@mail.com",      "Antenne":"Lyon – Auvergne-Rhône-Alpes",  "Type":"Événementiel", "Statut":"Actif",   "Parcours":"Recrutement externe"},
 ]
-
+ 
 mecenes_data = [
-    {"Prénom":"Jean",     "Nom":"Moreau",   "Société":"Moreau & Associés", "Mail":"j.moreau@moreau.fr",    "Don (€)":5000, "Reçu envoyé":"Oui"},
-    {"Prénom":"Isabelle", "Nom":"Fontaine", "Société":"Groupe Fontaine",   "Mail":"i.fontaine@gf.com",     "Don (€)":2500, "Reçu envoyé":"Non"},
-    {"Prénom":"Pierre",   "Nom":"Gauthier", "Société":"Gauthier Conseil",  "Mail":"p.gauthier@conseil.fr", "Don (€)":8000, "Reçu envoyé":"Oui"},
-    {"Prénom":"Nathalie", "Nom":"Lemoine",  "Société":"NL Équipements",    "Mail":"n.lemoine@nl.fr",       "Don (€)":1500, "Reçu envoyé":"Non"},
-    {"Prénom":"François", "Nom":"Mercier",  "Société":"Mercier Industries", "Mail":"f.mercier@mi.fr",      "Don (€)":12000,"Reçu envoyé":"Oui"},
+    {"Prénom":"Jean",      "Nom":"Moreau",     "Société":"Moreau & Associés",      "Mail":"j.moreau@moreau.fr",       "Don (€)":45000,  "Reçu envoyé":"Oui","Antenne":"Paris – Île-de-France"},
+    {"Prénom":"Isabelle",  "Nom":"Fontaine",   "Société":"Groupe Fontaine",        "Mail":"i.fontaine@gf.com",        "Don (€)":80000,  "Reçu envoyé":"Non","Antenne":"Lyon – Auvergne-Rhône-Alpes"},
+    {"Prénom":"Pierre",    "Nom":"Gauthier",   "Société":"Gauthier Conseil",       "Mail":"p.gauthier@conseil.fr",    "Don (€)":120000, "Reçu envoyé":"Oui","Antenne":"Paris – Île-de-France"},
+    {"Prénom":"Nathalie",  "Nom":"Lemoine",    "Société":"NL Équipements",         "Mail":"n.lemoine@nl.fr",          "Don (€)":35000,  "Reçu envoyé":"Non","Antenne":"Marseille – PACA"},
+    {"Prénom":"François",  "Nom":"Mercier",    "Société":"Mercier Industries",     "Mail":"f.mercier@mi.fr",          "Don (€)":200000, "Reçu envoyé":"Oui","Antenne":"Bordeaux – Nouvelle-Aquitaine"},
+    {"Prénom":"Hélène",    "Nom":"Desnoyers",  "Société":"HD Partenaires",         "Mail":"h.desnoyers@hdp.fr",       "Don (€)":60000,  "Reçu envoyé":"Oui","Antenne":"Paris – Île-de-France"},
+    {"Prénom":"Bertrand",  "Nom":"Castaing",   "Société":"Castaing Immobilier",    "Mail":"b.castaing@castimmo.fr",   "Don (€)":90000,  "Reçu envoyé":"Non","Antenne":"Bordeaux – Nouvelle-Aquitaine"},
+    {"Prénom":"Sylvie",    "Nom":"Aubert",     "Société":"Fondation Aubert",       "Mail":"s.aubert@fondaubert.org",  "Don (€)":150000, "Reçu envoyé":"Oui","Antenne":"Lyon – Auvergne-Rhône-Alpes"},
+    {"Prénom":"Christophe","Nom":"Villain",    "Société":"CV Consulting",          "Mail":"c.villain@cvconsult.fr",   "Don (€)":25000,  "Reçu envoyé":"Oui","Antenne":"Marseille – PACA"},
+    {"Prénom":"Valérie",   "Nom":"Truchot",    "Société":"Truchot Santé",          "Mail":"v.truchot@truchotsante.fr","Don (€)":75000,  "Reçu envoyé":"Non","Antenne":"Rennes – Bretagne"},
+    {"Prénom":"Arnaud",    "Nom":"Peltier",    "Société":"Peltier Groupe",         "Mail":"a.peltier@peltiergroupe.fr","Don (€)":110000,"Reçu envoyé":"Oui","Antenne":"Paris – Île-de-France"},
 ]
-
+ 
 classement = [
-    {"rang":"🥇","nom":"Annabel","role":"Présidente",  "init":"AN","heures":20,"bg":"#F4C0D1","txt":"#993556"},
-    {"rang":"🥈","nom":"Céline",   "role":"Directrice",      "init":"GI","heures":15,"bg":"#9FE1CB","txt":"#0F6E56"},
-    {"rang":"🥉","nom":"Sandrine", "role":"Secrétariat",  "init":"SA","heures":12,"bg":"#B5D4F4","txt":"#185FA5"},
-    {"rang":"4️⃣","nom":"Emeline",  "role":"Événementiel", "init":"EM","heures":10,"bg":"#FAC775","txt":"#854F0B"},
+    {"rang":"🥇","nom":"Annabelle","role":"Responsable",  "init":"AN","heures":47,"bg":"#F4C0D1","txt":"#993556"},
+    {"rang":"🥈","nom":"Gilles",   "role":"Terrain",      "init":"GI","heures":38,"bg":"#9FE1CB","txt":"#0F6E56"},
+    {"rang":"🥉","nom":"Sandrine", "role":"Secrétariat",  "init":"SA","heures":29,"bg":"#B5D4F4","txt":"#185FA5"},
+    {"rang":"4️⃣","nom":"Emeline",  "role":"Événementiel", "init":"EM","heures":21,"bg":"#FAC775","txt":"#854F0B"},
 ]
-
-# ── Consolidation de tous les contacts avec mail ──
+ 
+profils = {
+    "Annabelle – Responsable nationale": {"role":"responsable","antenne":"Toutes","acces":["accueil","beneficiaires","benevoles","mecenes","newsletter","groupes","antennes","photos"]},
+    "Gilles – Antenne Lyon":             {"role":"antenne",    "antenne":"Lyon – Auvergne-Rhône-Alpes","acces":["accueil","beneficiaires","benevoles","antennes"]},
+    "Sandrine – Secrétariat":            {"role":"secretariat","antenne":"Toutes","acces":["accueil","beneficiaires","benevoles","mecenes","newsletter","antennes"]},
+    "Emeline – Communication":           {"role":"communication","antenne":"Toutes","acces":["accueil","newsletter","photos","antennes"]},
+    "Laurence – Antenne Paris":          {"role":"antenne",    "antenne":"Paris – Île-de-France","acces":["accueil","beneficiaires","benevoles","antennes"]},
+}
+ 
 tous_contacts = []
 for r in beneficiaires_data:
-    if r["Mail"]:
-        tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Bénéficiaire"})
+    if r["Mail"]: tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Bénéficiaire","Antenne":r["Antenne"]})
 for r in benevoles_data:
-    if r["Mail"]:
-        tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Bénévole"})
+    if r["Mail"]: tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Bénévole","Antenne":r["Antenne"]})
 for r in mecenes_data:
-    tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Mécène"})
-
-
+    tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Mécène","Antenne":r["Antenne"]})
+ 
+groupes_wa = [
+    {"nom":"Groupe Administrateurs HOPE","membres":["Annabelle","Gilles","Sandrine","Emeline","Laurence"],
+     "infos_importantes":["Budget Q2 validé à 85% — vigilance frais transport","Nouvelle réglementation équestre dès sept. 2025","Recrutement coordinateur Rennes — 3 candidatures reçues"],
+     "messages":[
+         {"auteur":"Annabelle","heure":"09:14","type":"texte","contenu":"Bonjour à tous, le dossier de subvention région IDF a été déposé hier. On attend retour sous 6 semaines."},
+         {"auteur":"Gilles","heure":"09:32","type":"vocal","duree":"1min 24s","transcription":"Salut tout le monde. J'ai eu le responsable du centre de Lyon hier soir. Il confirme les dates pour le séjour de juillet. Par contre il nous demande si on peut anticiper le versement de l'acompte avant le 15 juin, sinon il ne peut pas garantir la disponibilité des chevaux. Faut valider ça rapidement."},
+         {"auteur":"Sandrine","heure":"10:05","type":"texte","contenu":"Reçu Gilles. Je prépare le bon de commande aujourd'hui. Annabelle tu peux valider la dépense ? L'acompte c'est 800€."},
+         {"auteur":"Annabelle","heure":"10:18","type":"texte","contenu":"Oui validé. Sandrine envoie-moi le bon pour signature avant midi stp."},
+     ]},
+    {"nom":"Groupe Coordination Séjours","membres":["Annabelle","Gilles","Laurence","Marie D."],
+     "infos_importantes":["Séjour été 2025 : 38 bénéficiaires confirmées, 4 places restantes","Transport 14 juillet non résolu — urgent","3 accompagnateurs manquants week-end du 21"],
+     "messages":[
+         {"auteur":"Laurence","heure":"08:45","type":"texte","contenu":"Bonjour équipe. J'ai finalisé la liste des bénéficiaires pour le séjour été. On a 38 jeunes confirmées, il reste 4 places."},
+         {"auteur":"Gilles","heure":"09:10","type":"vocal","duree":"52s","transcription":"Pour le transport du 14 juillet, j'ai appelé deux prestataires et c'est compliqué, ils sont tous complets. J'essaie encore avec un troisième. Si ça marche pas, on va devoir faire du covoiturage bénévoles."},
+         {"auteur":"Marie D.","heure":"10:22","type":"texte","contenu":"Pour les accompagnateurs, j'ai contacté Sophie et Claire, elles sont dispo le 21. Il manque encore 3 personnes."},
+     ]},
+]
+ 
+photos_data = [
+    {"titre":"Séjour Été 2024 – Lyon","date":"Juillet 2024","antenne":"Lyon – Auvergne-Rhône-Alpes","emoji":"🏇","description":"Retour en images sur le séjour équestre été 2024 — 42 participantes."},
+    {"titre":"Journée Découverte – Paris","date":"Mai 2025","antenne":"Paris – Île-de-France","emoji":"🌸","description":"Journée découverte au Centre Équestre de Versailles, 67 participantes."},
+    {"titre":"Gala des Mécènes 2024","date":"Novembre 2024","antenne":"Toutes antennes","emoji":"✨","description":"Soirée de remerciement des mécènes — 11 entreprises partenaires."},
+    {"titre":"Formation Bénévoles","date":"Mars 2025","antenne":"Marseille – PACA","emoji":"📚","description":"Week-end de formation pour les nouveaux bénévoles Marseille — 28 participants."},
+]
+ 
+ 
+# ─── NAVIGATION STATE ──────────────────────────────────────────────────────────
+menu_labels = {
+    "accueil":"🏠  Accueil","beneficiaires":"🧒  Bénéficiaires","benevoles":"👥  Bénévoles",
+    "mecenes":"💼  Mécènes","newsletter":"📰  Newsletter","groupes":"💬  Groupes Famille HOPE",
+    "antennes":"📍  Antennes","photos":"📷  Photos",
+}
+menu_labels_inv = {v: k for k, v in menu_labels.items()}  # label → key
+ 
+def navigate_to(page_key):
+    """Set current page by key (e.g. 'newsletter') and rerun."""
+    st.session_state["current_page_key"] = page_key
+    st.rerun()
+ 
 # ─── SIDEBAR ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     if logo_b64:
-        st.markdown(f'<div style="text-align:center;padding:16px 0 8px;"><img src="data:image/jpeg;base64,{logo_b64}" style="width:110px;border-radius:10px;" /></div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align:center;padding:14px 0 6px;"><img src="data:image/jpeg;base64,{logo_b64}" style="width:100px;border-radius:10px;" /></div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div style="text-align:center;padding:16px 0;font-size:1.8rem;color:{ROSE};">🐴 HOPE</div>', unsafe_allow_html=True)
-
+        st.markdown(f'<div style="text-align:center;padding:14px 0;font-size:1.8rem;color:{ROSE};">🐴 HOPE</div>', unsafe_allow_html=True)
+ 
     st.markdown("<hr class='sidebar-sep'>", unsafe_allow_html=True)
-
-    page = st.radio("", [
-        "🏠  Accueil",
-        "🧒  Bénéficiaires",
-        "👥  Bénévoles",
-        "💼  Mécènes",
-        "📰  Newsletter",
-    ], label_visibility="collapsed")
-
+ 
+    prev_profil = st.session_state.get("prev_profil", None)
+    profil_sel = st.selectbox("Profil", list(profils.keys()), label_visibility="collapsed")
+    profil     = profils[profil_sel]
+ 
+    # Reset page when profil changes
+    if prev_profil != profil_sel:
+        st.session_state["prev_profil"] = profil_sel
+        st.session_state["current_page_key"] = "accueil"
+ 
+    st.markdown(f'<div style="text-align:center;margin-bottom:8px;"><span class="profil-badge">{profil["role"].upper()}</span></div>', unsafe_allow_html=True)
     st.markdown("<hr class='sidebar-sep'>", unsafe_allow_html=True)
-
-    st.markdown("<p style='font-size:0.7rem;opacity:0.45;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;'>Classement connexions</p>", unsafe_allow_html=True)
+ 
+    menu_options = [menu_labels[k] for k in profil["acces"] if k in menu_labels]
+ 
+    # Determine current index for the radio from session state
+    current_key = st.session_state.get("current_page_key", "accueil")
+    # Fallback if current_key not in this profil's access
+    if current_key not in profil["acces"]:
+        current_key = profil["acces"][0]
+        st.session_state["current_page_key"] = current_key
+    current_label = menu_labels.get(current_key, menu_options[0])
+    current_idx = menu_options.index(current_label) if current_label in menu_options else 0
+ 
+    selected_label = st.radio("", menu_options, index=current_idx, label_visibility="collapsed")
+    # Sync radio → session state
+    selected_key = menu_labels_inv.get(selected_label, "accueil")
+    if selected_key != st.session_state.get("current_page_key"):
+        st.session_state["current_page_key"] = selected_key
+ 
+    page = selected_label  # keep 'page' variable for downstream if/elif checks
+ 
+    st.markdown("<hr class='sidebar-sep'>", unsafe_allow_html=True)
     max_h = max(p["heures"] for p in classement)
+    st.markdown("<p style='font-size:0.68rem;opacity:0.4;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;'>Classement connexions</p>", unsafe_allow_html=True)
     for p in classement:
         pct = int(p["heures"] / max_h * 100)
         st.markdown(f"""
         <div class="rank-item">
-            <div class="rank-medal">{p['rang']}</div>
+            <div style="font-size:1rem;min-width:20px;">{p['rang']}</div>
             <div class="rank-avatar" style="background:{p['bg']};color:{p['txt']};">{p['init']}</div>
             <div style="flex:1;">
-                <div style="font-size:0.85rem;font-weight:600;color:{BLANC};">{p['nom']}</div>
-                <div style="background:rgba(255,255,255,0.15);border-radius:4px;height:4px;margin-top:4px;overflow:hidden;">
-                    <div style="width:{pct}%;height:4px;background:{ROSE};border-radius:4px;"></div>
+                <div style="font-size:0.82rem;font-weight:600;color:{BLANC};">{p['nom']}</div>
+                <div style="background:rgba(255,255,255,0.15);border-radius:4px;height:3px;margin-top:3px;overflow:hidden;">
+                    <div style="width:{pct}%;height:3px;background:{ROSE};border-radius:4px;"></div>
                 </div>
             </div>
-            <div style="font-size:0.75rem;opacity:0.65;color:{BLANC};">{p['heures']}h</div>
+            <div style="font-size:0.72rem;opacity:0.6;color:{BLANC};">{p['heures']}h</div>
         </div>
         """, unsafe_allow_html=True)
-
-    st.markdown("<hr class='sidebar-sep'>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:0.75rem;opacity:0.45;'>Connecté : <strong>Annabelle</strong></p>", unsafe_allow_html=True)
-
-
+ 
+ 
 # ─── HEADER ────────────────────────────────────────────────────────────────────
-logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="height:56px;border-radius:10px;" />' if logo_b64 else "🐴"
+logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="height:52px;border-radius:10px;" />' if logo_b64 else "🐴"
+nom_user  = profil_sel.split("–")[0].strip()
+role_user = profil_sel.split("–")[1].strip() if "–" in profil_sel else ""
 st.markdown(f"""
 <div class="header-band">
     {logo_html}
-    <div>
+    <div style="flex:1;">
         <div class="header-title">Tableau de bord HOPE</div>
-        <div class="header-sub">CRM · WhatsApp IA · Relances automatiques — {datetime.now().strftime("%d %B %Y")}</div>
+        <div class="header-sub">CRM · WhatsApp IA · {datetime.now().strftime("%d %B %Y")}</div>
+    </div>
+    <div style="text-align:right;">
+        <div style="font-size:1rem;font-weight:700;color:white;">👤 {nom_user}</div>
+        <div style="font-size:0.8rem;opacity:0.7;">{role_user}</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
-
-
+ 
+ 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PAGE : ACCUEIL
 # ═══════════════════════════════════════════════════════════════════════════════
 if "Accueil" in page:
-    col1, col2, col3, col4 = st.columns(4)
-    kpis = [
-        (col1, str(len(benevoles_data)),    "Bénévoles actifs"),
-        (col2, str(len(beneficiaires_data)),"Bénéficiaires"),
-        (col3, str(len(mecenes_data)),      "Mécènes"),
-        (col4, str(len(tous_contacts)),     "Contacts avec mail"),
-    ]
-    for col, num, label in kpis:
-        with col:
-            st.markdown(f'<div class="kpi-card"><div class="kpi-number">{num}</div><div class="kpi-label">{label}</div></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    col_a, col_b = st.columns(2)
-
-    with col_a:
-        st.markdown('<span class="section-title">Activité WhatsApp – 30 jours</span>', unsafe_allow_html=True)
-        mois = ["Jan","Fév","Mar","Avr","Mai","Jun"]
-        msgs = [42, 58, 75, 61, 89, 94]
-        fig = go.Figure(go.Bar(x=mois, y=msgs, marker_color=ROSE, opacity=0.85, text=msgs, textposition="outside"))
-        fig.update_layout(plot_bgcolor="white", paper_bgcolor="white", font=dict(family="DM Sans"),
-                          yaxis=dict(gridcolor="#f0e8ec", range=[0,110]),
-                          margin=dict(t=20,b=10,l=10,r=10), height=260, showlegend=False)
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col_b:
-        st.markdown('<span class="section-title">Résumés IA WhatsApp</span>', unsafe_allow_html=True)
-        resumes = [
-            ("Groupe Séjour Été 2025","Aujourd'hui 09h14","Confirmation hébergements ok. Transport du 14/07 en attente — 3 familles concernées."),
-            ("Groupe Bénévoles",      "Hier 17h32",        "Thomas indisponible le 21. Marie propose de remplacer. 2 accompagnateurs manquants."),
-            ("Groupe Familles HOPE",  "Hier 11h05",        "Plusieurs parents demandent le programme printemps. Régime spécifique pour Chloé M."),
+    role = profil["role"]
+    antenne_profil = profil["antenne"]
+    df_benv_acc = pd.DataFrame(benevoles_data)
+    df_ben_acc  = pd.DataFrame(beneficiaires_data)
+    if antenne_profil != "Toutes":
+        df_benv_acc = df_benv_acc[df_benv_acc["Antenne"] == antenne_profil]
+        df_ben_acc  = df_ben_acc[df_ben_acc["Antenne"] == antenne_profil]
+ 
+    # ── KPIs globaux ──
+    if role in ["responsable","secretariat"]:
+        nb_reg = len([b for b in benevoles_data if b["Type"]=="Régulier"])
+        nb_evt = len([b for b in benevoles_data if b["Type"]=="Événementiel"])
+        total_dons = sum(m["Don (€)"] for m in mecenes_data)
+        col1,col2,col3,col4,col5 = st.columns(5)
+        kpis = [
+            (col1, str(len(beneficiaires_data)), "Bénéficiaires accompagnées", ROSE),
+            (col2, str(nb_reg + nb_evt), "Bénévoles actifs", "#1a3a6b"),
+            (col3, str(len(mecenes_data)), "Mécènes", "#BA7517"),
+            (col4, f"{total_dons//1000}k €", "Dons collectés", "#1D9E75"),
+            (col5, str(len(tous_contacts)), "Contacts mail", GRIS_TEXT),
         ]
-        for groupe, date, resume in resumes:
+        for col,num,label,couleur in kpis:
+            with col: st.markdown(f'<div class="kpi-card" style="border-left-color:{couleur};"><div class="kpi-number" style="color:{couleur};">{num}</div><div class="kpi-label">{label}</div></div>', unsafe_allow_html=True)
+    elif role == "antenne":
+        nb_reg  = len(df_benv_acc[df_benv_acc["Type"]=="Régulier"])
+        nb_evt  = len(df_benv_acc[df_benv_acc["Type"]=="Événementiel"])
+        col1,col2,col3 = st.columns(3)
+        with col1: st.markdown(f'<div class="kpi-card"><div class="kpi-number">{len(df_ben_acc)}</div><div class="kpi-label">Bénéficiaires</div></div>', unsafe_allow_html=True)
+        with col2: st.markdown(f'<div class="kpi-card" style="border-left-color:#1a3a6b;"><div class="kpi-number" style="color:#1a3a6b;">{nb_reg}</div><div class="kpi-label">Bénévoles réguliers</div></div>', unsafe_allow_html=True)
+        with col3: st.markdown(f'<div class="kpi-card" style="border-left-color:#7c3aed;"><div class="kpi-number" style="color:#7c3aed;">{nb_evt}</div><div class="kpi-label">Bénévoles événementiels</div></div>', unsafe_allow_html=True)
+    elif role == "communication":
+        col1,col2,col3 = st.columns(3)
+        with col1: st.markdown(f'<div class="kpi-card"><div class="kpi-number">{len(tous_contacts)}</div><div class="kpi-label">Contacts avec mail</div></div>', unsafe_allow_html=True)
+        with col2: st.markdown(f'<div class="kpi-card"><div class="kpi-number">4</div><div class="kpi-label">Albums photos</div></div>', unsafe_allow_html=True)
+        with col3: st.markdown(f'<div class="kpi-card"><div class="kpi-number">3</div><div class="kpi-label">Newsletters envoyées</div></div>', unsafe_allow_html=True)
+ 
+    st.markdown("<br>", unsafe_allow_html=True)
+ 
+    # ── BLOCS OUTILS — Newsletter en grand, reste en grille avec boutons fonctionnels ──
+    st.markdown('<span class="section-title">🛠️ Accès rapide</span>', unsafe_allow_html=True)
+ 
+    outils_acces = profil["acces"]
+ 
+    outil_map = {
+        "beneficiaires": ("🧒", "Bénéficiaires",    "Gérer les jeunes accompagnées"),
+        "benevoles":     ("👥", "Bénévoles",         "Gérer les bénévoles"),
+        "mecenes":       ("💼", "Mécènes",           "Gérer les mécènes et les dons"),
+        "groupes":       ("💬", "Groupes WhatsApp",  "Transcriptions et infos"),
+        "antennes":      ("📍", "Antennes",          "Fiches antennes et responsables"),
+        "photos":        ("📷", "Photos",            "Albums et galerie"),
+        "newsletter":    ("📰", "Newsletter",        "Envoyer une campagne à tous vos contacts"),
+    }
+ 
+    if "newsletter" in outils_acces:
+        col_nws, col_rest = st.columns([1, 2])
+        with col_nws:
             st.markdown(f"""
-            <div style="background:linear-gradient(135deg,{NOIR} 0%,#3D1A2A 100%);border-radius:12px;padding:14px 18px;color:white;margin-bottom:10px;border-left:4px solid {ROSE};">
-                <span style="background:{ROSE};color:white;font-size:0.68rem;padding:2px 8px;border-radius:20px;margin-bottom:6px;display:inline-block;">✨ IA WhatsApp</span>
-                <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">{groupe}</div>
-                <div style="font-size:0.82rem;opacity:0.85;line-height:1.5;">{resume}</div>
-                <div style="font-size:0.72rem;opacity:0.5;margin-top:6px;">📅 {date}</div>
+            <div class="tool-card-newsletter">
+                <div class="tool-icon">📰</div>
+                <div class="tool-name">Newsletter</div>
+                <div class="tool-desc">Envoyer une campagne à tous vos contacts</div>
             </div>
             """, unsafe_allow_html=True)
-
-
+            if st.button("→ Newsletter", key="btn_nws_accueil", use_container_width=True):
+                navigate_to("newsletter")
+ 
+        with col_rest:
+            autres = [k for k in outils_acces if k not in ["accueil", "newsletter"]]
+            cols_tools = st.columns(3)
+            for i, k in enumerate(autres):
+                if k in outil_map:
+                    icon, nom, desc = outil_map[k]
+                    with cols_tools[i % 3]:
+                        st.markdown(f'<div class="tool-card"><div class="tool-icon">{icon}</div><div class="tool-name">{nom}</div><div class="tool-desc">{desc}</div></div>', unsafe_allow_html=True)
+                        if st.button(f"→ {nom}", key=f"btn_{k}_accueil", use_container_width=True):
+                            navigate_to(k)
+    else:
+        autres = [k for k in outils_acces if k != "accueil"]
+        cols_tools = st.columns(4)
+        for i, k in enumerate(autres):
+            if k in outil_map:
+                icon, nom, desc = outil_map[k]
+                with cols_tools[i % 4]:
+                    st.markdown(f'<div class="tool-card"><div class="tool-icon">{icon}</div><div class="tool-name">{nom}</div><div class="tool-desc">{desc}</div></div>', unsafe_allow_html=True)
+                    if st.button(f"→ {nom}", key=f"btn_{k}_accueil", use_container_width=True):
+                        navigate_to(k)
+ 
+    # ── Graphiques (rôles avec accès complet) ──
+    if role in ["responsable","secretariat"]:
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_a,col_b = st.columns(2)
+        with col_a:
+            st.markdown('<span class="section-title">Bénévoles par type et antenne</span>', unsafe_allow_html=True)
+            df_bv = pd.DataFrame(benevoles_data)
+            fig = px.bar(df_bv.groupby(["Antenne","Type"]).size().reset_index(name="n"),
+                         x="Antenne", y="n", color="Type",
+                         color_discrete_map={"Régulier":"#1a3a6b","Événementiel":"#7c3aed"},
+                         barmode="stack")
+            fig.update_layout(plot_bgcolor="white",paper_bgcolor="white",font=dict(family="DM Sans"),
+                              margin=dict(t=10,b=40,l=10,r=10),height=260,legend=dict(orientation="h",y=-0.35),
+                              xaxis_tickangle=-20)
+            st.plotly_chart(fig, use_container_width=True)
+        with col_b:
+            st.markdown('<span class="section-title">Parcours des bénévoles</span>', unsafe_allow_html=True)
+            df_bv = pd.DataFrame(benevoles_data)
+            parc  = df_bv["Parcours"].value_counts().reset_index()
+            parc.columns = ["Parcours","n"]
+            fig2 = px.pie(parc, values="n", names="Parcours",
+                          color_discrete_sequence=[ROSE,"#1a3a6b"],hole=0.55)
+            fig2.update_layout(margin=dict(t=10,b=10,l=10,r=10),height=260,
+                               font=dict(family="DM Sans"),paper_bgcolor="white")
+            st.plotly_chart(fig2, use_container_width=True)
+ 
+ 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PAGE : BÉNÉFICIAIRES
 # ═══════════════════════════════════════════════════════════════════════════════
 elif "Bénéficiaires" in page:
-    st.markdown('<span class="section-title">🧒 Gestion des bénéficiaires</span>', unsafe_allow_html=True)
-    st.markdown(f'<div class="wa-source"><span style="font-size:1.1rem;">💬</span><span>Données récupérées automatiquement via l\'<strong>API WhatsApp</strong> — aucune saisie manuelle requise</span></div>', unsafe_allow_html=True)
-
-    col_r, col_c = st.columns(2)
-    with col_r:
-        region = st.selectbox("📍 Région", ["Toutes les régions"] + list(centres.keys()))
-    with col_c:
-        if region == "Toutes les régions":
-            tous_centres = [c for liste in centres.values() for c in liste]
-            centre_sel = st.selectbox("🏇 Centre équestre", ["Tous les centres"] + tous_centres)
-        else:
-            centre_sel = st.selectbox("🏇 Centre équestre", ["Tous les centres"] + centres[region])
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    df_ben = pd.DataFrame(beneficiaires_data)
-    if centre_sel != "Tous les centres":
-        df_ben = df_ben[df_ben["Centre"] == centre_sel]
-
-    st.markdown('<span class="section-title" style="font-size:1rem;">Liste des bénéficiaires</span>', unsafe_allow_html=True)
-    html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Séjour</th><th>Centre</th><th>Mail</th><th>Source</th></tr>'
-    for _, row in df_ben.iterrows():
-        mail_cell = row['Mail'] if row['Mail'] else f'<span style="color:{ROSE};font-size:0.8rem;cursor:pointer;">+ Ajouter</span>'
-        html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{row["Téléphone"]}</td><td><span class="badge-inscrit">{row["Séjour"]}</span></td><td style="font-size:0.8rem;color:{GRIS_TEXT};">{row["Centre"]}</td><td>{mail_cell}</td><td><span class="badge-wa">📱 WhatsApp</span></td></tr>'
-    html += "</table>"
-    st.markdown(html, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<span class="section-title">🧒 Bénéficiaires — Jeunes femmes accompagnées</span>', unsafe_allow_html=True)
+    st.markdown(f'<div class="wa-source"><span>💬</span><span>Données récupérées automatiquement via l\'<strong>API WhatsApp</strong></span></div>', unsafe_allow_html=True)
     st.markdown(f"""
-    <div class="action-card">
-        <div class="action-title">📧 Proposition de bénévolat</div>
-        <p style="font-size:0.85rem;color:{GRIS_TEXT};margin-bottom:0;">Envoyer automatiquement un mail à des bénéficiaires pour leur proposer de devenir bénévole.</p>
+    <div class="potentiel-banner">
+        <span style="font-size:1.3rem;">💡</span>
+        <span>Toutes les bénéficiaires sont considérées comme <strong>bénévoles potentielles</strong>.
+        Le statut de démarche est indiqué dans la colonne <em>Potentielle</em>.</span>
     </div>
     """, unsafe_allow_html=True)
-    dest = st.multiselect("Sélectionner les destinataires",
-        [f"{r['Prénom']} {r['Nom']}" for _, r in df_ben.iterrows() if r['Mail']],
-        default=[f"{r['Prénom']} {r['Nom']}" for _, r in df_ben.iterrows() if r['Mail']])
+ 
+    df_ben = pd.DataFrame(beneficiaires_data).sort_values("Antenne")
+    antenne_profil = profil["antenne"]
+ 
+    col_f1, col_f2, col_f3 = st.columns(3)
+    with col_f1:
+        ant_opts = [antenne_profil] if antenne_profil != "Toutes" else ["Toutes les antennes"] + antennes
+        ant_sel  = st.selectbox("📍 Antenne", ant_opts)
+    with col_f2:
+        sejour_sel = st.selectbox("🏕️ Séjour", ["Tous"] + sorted(df_ben["Séjour"].unique().tolist()))
+    with col_f3:
+        pot_sel = st.selectbox("🌱 Statut bénévole potentielle", ["Toutes","Oui","Contactée"])
+ 
+    if ant_sel != "Toutes les antennes": df_ben = df_ben[df_ben["Antenne"] == ant_sel]
+    if sejour_sel != "Tous":             df_ben = df_ben[df_ben["Séjour"] == sejour_sel]
+    if pot_sel != "Toutes":             df_ben = df_ben[df_ben["Potentielle_benv"] == pot_sel]
+ 
+    for ant in df_ben["Antenne"].unique():
+        df_a = df_ben[df_ben["Antenne"] == ant]
+        st.markdown(f'<div class="ant-section">📍 {ant} ({len(df_a)})</div>', unsafe_allow_html=True)
+        html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Séjour</th><th>Mail</th><th>Potentielle bénévole</th><th>Source</th></tr>'
+        for _, row in df_a.iterrows():
+            mail_cell = row['Mail'] if row['Mail'] else f'<span style="color:{ROSE};font-size:0.8rem;">+ Ajouter</span>'
+            if row["Potentielle_benv"] == "Contactée":
+                pot_badge = f'<span style="background:#fef9c3;color:#854d0e;font-size:0.7rem;padding:2px 8px;border-radius:20px;">📩 Contactée</span>'
+            else:
+                pot_badge = f'<span class="badge-potentiel">🌱 Oui</span>'
+            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{row["Téléphone"]}</td><td><span class="badge-inscrit">{row["Séjour"]}</span></td><td>{mail_cell}</td><td>{pot_badge}</td><td><span class="badge-wa">📱 WA</span></td></tr>'
+        html += "</table>"
+        st.markdown(html, unsafe_allow_html=True)
+ 
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(f'<div class="action-card"><div class="action-title">📧 Envoyer une proposition de bénévolat aux potentielles</div></div>', unsafe_allow_html=True)
+    dest_pot = [f"{r['Prénom']} {r['Nom']}" for _, r in df_ben.iterrows() if r['Mail'] and r['Potentielle_benv'] == "Oui"]
+    sel_pot  = st.multiselect("Destinataires (potentielles non encore contactées)", dest_pot, default=dest_pot)
     if st.button("📤 Envoyer la proposition de bénévolat", type="primary"):
-        st.success(f"✅ Mail envoyé à {len(dest)} bénéficiaire(s) !")
-
-
+        st.success(f"✅ Proposition envoyée à {len(sel_pot)} bénéficiaire(s). Leur statut passera à « Contactée ».")
+ 
+ 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PAGE : BÉNÉVOLES
 # ═══════════════════════════════════════════════════════════════════════════════
 elif "Bénévoles" in page:
     st.markdown('<span class="section-title">👥 Gestion des bénévoles</span>', unsafe_allow_html=True)
-    tab1, tab2, tab3 = st.tabs(["📋 Liste", "➕ Ajouter", "📧 Invitation séjour"])
-
+ 
+    df_bv = pd.DataFrame(benevoles_data)
+    nb_reg = len(df_bv[df_bv["Type"]=="Régulier"])
+    nb_evt = len(df_bv[df_bv["Type"]=="Événementiel"])
+    nb_anc = len(df_bv[df_bv["Parcours"]=="Ancienne bénéficiaire"])
+    nb_ext = len(df_bv[df_bv["Parcours"]=="Recrutement externe"])
+    col1,col2,col3,col4 = st.columns(4)
+    with col1: st.markdown(f'<div class="kpi-card" style="border-left-color:#1a3a6b;"><div class="kpi-number" style="color:#1a3a6b;">{nb_reg}</div><div class="kpi-label">Réguliers</div></div>', unsafe_allow_html=True)
+    with col2: st.markdown(f'<div class="kpi-card" style="border-left-color:#7c3aed;"><div class="kpi-number" style="color:#7c3aed;">{nb_evt}</div><div class="kpi-label">Événementiels</div></div>', unsafe_allow_html=True)
+    with col3: st.markdown(f'<div class="kpi-card" style="border-left-color:{ROSE};"><div class="kpi-number" style="color:{ROSE};">{nb_anc}</div><div class="kpi-label">Anciennes bénéficiaires</div></div>', unsafe_allow_html=True)
+    with col4: st.markdown(f'<div class="kpi-card" style="border-left-color:#374151;"><div class="kpi-number" style="color:#374151;">{nb_ext}</div><div class="kpi-label">Recrutement externe</div></div>', unsafe_allow_html=True)
+ 
+    st.markdown("<br>", unsafe_allow_html=True)
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Tous les bénévoles","🔵 Réguliers","🟣 Événementiels","➕ Ajouter / Inviter"])
+ 
+    def render_benevoles_table(df_filtered):
+        antenne_profil = profil["antenne"]
+        if antenne_profil != "Toutes":
+            df_filtered = df_filtered[df_filtered["Antenne"] == antenne_profil]
+        ant_f = st.selectbox("📍 Antenne", (["Toutes"] + antennes) if profil["antenne"]=="Toutes" else [profil["antenne"]], key=f"ant_{id(df_filtered)}")
+        if ant_f != "Toutes": df_filtered = df_filtered[df_filtered["Antenne"]==ant_f]
+        for ant in df_filtered["Antenne"].unique():
+            df_a = df_filtered[df_filtered["Antenne"]==ant]
+            st.markdown(f'<div class="ant-section">📍 {ant} ({len(df_a)})</div>', unsafe_allow_html=True)
+            html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Mail</th><th>Type</th><th>Parcours</th><th>Statut</th></tr>'
+            for _, row in df_a.iterrows():
+                if row["Type"]=="Régulier":     type_b = '<span class="badge-regulier">Régulier</span>'
+                elif row["Type"]=="Événementiel": type_b = '<span class="badge-evenement">Événementiel</span>'
+                else:                            type_b = '<span class="badge-externe">Externe</span>'
+                if row["Parcours"]=="Ancienne bénéficiaire": parc_b = f'<span class="parcours-tag">🌱 Anc. bénéficiaire</span>'
+                else:                                         parc_b = f'<span class="parcours-ext">🔗 Recrutement ext.</span>'
+                if row["Statut"]=="Actif":    stat_b = '<span class="badge-actif">Actif</span>'
+                elif row["Statut"]=="Relance": stat_b = '<span class="badge-attente">Relance</span>'
+                else:                          stat_b = '<span class="badge-inactif">Inactif</span>'
+                html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{row["Téléphone"]}</td><td style="font-size:0.82rem;">{row["Mail"] or "—"}</td><td>{type_b}</td><td>{parc_b}</td><td>{stat_b}</td></tr>'
+            html += "</table>"
+            st.markdown(html, unsafe_allow_html=True)
+ 
     with tab1:
-        df_benv = pd.DataFrame(benevoles_data)
-        html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Mail</th><th>Centre</th><th>Statut</th></tr>'
-        for _, row in df_benv.iterrows():
-            if row['Statut'] == "Actif":   badge = '<span class="badge-inscrit">Actif</span>'
-            elif row['Statut'] == "Relance": badge = '<span class="badge-attente">Relance</span>'
-            else: badge = '<span style="background:#f8d7da;color:#721c24;font-size:0.72rem;padding:2px 8px;border-radius:20px;">Inactif</span>'
-            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{row["Téléphone"]}</td><td style="font-size:0.82rem;">{row["Mail"] or "—"}</td><td style="font-size:0.8rem;color:{GRIS_TEXT};">{row["Centre"]}</td><td>{badge}</td></tr>'
-        html += "</table>"
-        st.markdown(html, unsafe_allow_html=True)
-
+        render_benevoles_table(df_bv.sort_values(["Antenne","Type"]).copy())
+ 
     with tab2:
-        mode = st.radio("Mode d'ajout", ["Saisie manuelle", "Convertir un bénéficiaire"], horizontal=True)
-        if mode == "Saisie manuelle":
-            c1, c2 = st.columns(2)
-            with c1:
-                prenom_benv = st.text_input("Prénom")
-                tel_benv    = st.text_input("Téléphone")
-                region_benv = st.selectbox("Région", list(centres.keys()), key="reg_benv")
-            with c2:
-                nom_benv    = st.text_input("Nom")
-                mail_benv   = st.text_input("Mail")
-                centre_benv = st.selectbox("Centre", centres[region_benv], key="ctr_benv")
-            if st.button("✅ Ajouter le bénévole", type="primary"):
-                st.success(f"Bénévole {prenom_benv} {nom_benv} ajouté au centre {centre_benv} !")
-        else:
-            df_conv = pd.DataFrame(beneficiaires_data)
-            choix = st.selectbox("Choisir un bénéficiaire",
-                [f"{r['Prénom']} {r['Nom']} – {r['Centre']}" for _, r in df_conv.iterrows()])
-            st.info("Le bénéficiaire sera converti avec ses informations WhatsApp existantes.")
-            if st.button("🔄 Convertir en bénévole", type="primary"):
-                st.success(f"✅ {choix.split('–')[0].strip()} est maintenant bénévole !")
-
+        st.markdown(f'<div class="potentiel-banner"><span style="font-size:1.2rem;">🔵</span><span>Les bénévoles <strong>réguliers</strong> s\'engagent sur la durée. Ils constituent le cœur de l\'association.</span></div>', unsafe_allow_html=True)
+        render_benevoles_table(df_bv[df_bv["Type"]=="Régulier"].sort_values("Antenne").copy())
+ 
     with tab3:
-        st.markdown(f'<div class="action-card"><div class="action-title">📧 Inviter des bénévoles à participer à un séjour ou une journée découverte</div></div>', unsafe_allow_html=True)
-        df_benv2 = pd.DataFrame(benevoles_data)
-        benv_avec_mail = [f"{r['Prénom']} {r['Nom']}" for _, r in df_benv2.iterrows() if r['Mail']]
-        type_event  = st.radio("Type d'événement", ["Séjour", "Journée découverte"], horizontal=True)
-        date_event  = st.date_input("Date de l'événement")
-        selec_benv  = st.multiselect("Sélectionner les bénévoles", benv_avec_mail, default=benv_avec_mail)
-        if st.button(f"📤 Envoyer l'invitation ({type_event})", type="primary"):
-            st.success(f"✅ Invitation pour le {type_event} du {date_event.strftime('%d/%m/%Y')} envoyée à {len(selec_benv)} bénévole(s) !")
-
-
+        st.markdown(f'<div class="potentiel-banner" style="background:linear-gradient(90deg,#f0e8ff,#fff);border-color:#c4b5fd;"><span style="font-size:1.2rem;">🟣</span><span>Les bénévoles <strong>événementiels</strong> interviennent ponctuellement sur des séjours ou journées découverte spécifiques.</span></div>', unsafe_allow_html=True)
+        render_benevoles_table(df_bv[df_bv["Type"]=="Événementiel"].sort_values("Antenne").copy())
+ 
+    with tab4:
+        st.markdown("#### ➕ Ajouter un bénévole")
+        mode = st.radio("Mode", ["Saisie manuelle (externe)","Convertir une bénéficiaire"], horizontal=True)
+ 
+        if mode == "Saisie manuelle (externe)":
+            st.info("Ce bénévole sera marqué comme **recrutement externe** — il n'est pas issu du parcours bénéficiaire.")
+            c1,c2 = st.columns(2)
+            with c1:
+                pf = st.text_input("Prénom *")
+                tf = st.text_input("Téléphone")
+                ant_add = st.selectbox("Antenne *", antennes, key="ant_add")
+            with c2:
+                nf = st.text_input("Nom *")
+                mf = st.text_input("Mail")
+                type_add = st.selectbox("Type d'engagement", ["Régulier","Événementiel"], key="type_add")
+            if st.button("✅ Ajouter le bénévole", type="primary"):
+                if pf and nf:
+                    st.success(f"✅ {pf} {nf} ajouté(e) comme bénévole {type_add} (recrutement externe) sur l'antenne {ant_add} !")
+                else: st.warning("⚠️ Prénom et nom obligatoires.")
+        else:
+            st.info("La bénéficiaire convertie sera marquée **ancienne bénéficiaire** dans son profil bénévole.")
+            choix = st.selectbox("Choisir une bénéficiaire", [f"{r['Prénom']} {r['Nom']} – {r['Antenne']}" for r in beneficiaires_data])
+            type_conv = st.radio("Type d'engagement souhaité", ["Régulier","Événementiel"], horizontal=True, key="type_conv")
+            if st.button("🔄 Convertir en bénévole", type="primary"):
+                st.success(f"✅ {choix.split('–')[0].strip()} est maintenant bénévole {type_conv} (ancienne bénéficiaire) !")
+ 
+        st.markdown("---")
+        st.markdown("#### 📧 Inviter des bénévoles à un événement")
+        col_inv1, col_inv2 = st.columns(2)
+        with col_inv1:
+            type_evt  = st.radio("Type d'événement", ["Séjour","Journée découverte"], horizontal=True, key="type_evt_inv")
+            date_evt  = st.date_input("Date", key="date_inv")
+        with col_inv2:
+            cible_inv = st.multiselect("Cibler par type de bénévole", ["Régulier","Événementiel"], default=["Régulier","Événementiel"])
+            ant_inv   = st.selectbox("Antenne cible", ["Toutes"] + antennes, key="ant_inv")
+ 
+        df_inv = df_bv[df_bv["Type"].isin(cible_inv)]
+        if ant_inv != "Toutes": df_inv = df_inv[df_inv["Antenne"]==ant_inv]
+        benv_inv = [f"{r['Prénom']} {r['Nom']}" for _, r in df_inv.iterrows() if r['Mail']]
+        sel_inv  = st.multiselect("Sélection finale", benv_inv, default=benv_inv)
+        if st.button(f"📤 Envoyer l'invitation ({type_evt})", type="primary"):
+            st.success(f"✅ Invitation {type_evt} du {date_evt.strftime('%d/%m/%Y')} envoyée à {len(sel_inv)} bénévole(s) !")
+ 
+ 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PAGE : MÉCÈNES
 # ═══════════════════════════════════════════════════════════════════════════════
 elif "Mécènes" in page:
     st.markdown('<span class="section-title">💼 Gestion des mécènes</span>', unsafe_allow_html=True)
-    tab_m1, tab_m2, tab_m3, tab_m4 = st.tabs(["📋 Liste", "🎉 Invitation événement", "🧾 Reçu fiscal", "➕ Ajouter un mécène"])
-
-    df_mec = pd.DataFrame(mecenes_data)
-
+    tab_m1,tab_m2,tab_m3,tab_m4 = st.tabs(["📋 Liste par antenne","🎉 Invitation événement","🧾 Reçu fiscal","➕ Ajouter un mécène"])
+    df_mec = pd.DataFrame(mecenes_data).sort_values("Antenne")
     with tab_m1:
-        html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Société</th><th>Mail</th><th>Don (€)</th><th>Reçu fiscal</th></tr>'
-        for _, row in df_mec.iterrows():
-            recu = '<span class="badge-inscrit">Envoyé</span>' if row['Reçu envoyé'] == "Oui" else '<span class="badge-attente">En attente</span>'
-            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td style="font-size:0.82rem;color:{GRIS_TEXT};">{row["Société"]}</td><td style="font-size:0.82rem;">{row["Mail"]}</td><td style="font-weight:700;color:{ROSE};">{row["Don (€)"]:,} €</td><td>{recu}</td></tr>'
-        html += "</table>"
-        st.markdown(html, unsafe_allow_html=True)
-        total = sum(r['Don (€)'] for r in mecenes_data)
-        st.markdown(f'<div style="text-align:right;margin-top:12px;font-family:Playfair Display,serif;font-size:1.1rem;color:{NOIR};">Total des dons : <strong style="color:{ROSE};">{total:,} €</strong></div>', unsafe_allow_html=True)
-
+        ant_mec = st.selectbox("📍 Antenne",["Toutes les antennes"]+antennes,key="ant_mec_liste")
+        df_m = df_mec if ant_mec=="Toutes les antennes" else df_mec[df_mec["Antenne"]==ant_mec]
+        for ant in df_m["Antenne"].unique():
+            df_a = df_m[df_m["Antenne"]==ant]
+            st.markdown(f'<div class="ant-section">📍 {ant}</div>', unsafe_allow_html=True)
+            html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Société</th><th>Mail</th><th>Don (€)</th><th>Reçu</th></tr>'
+            for _,row in df_a.iterrows():
+                recu = '<span class="badge-actif">Envoyé</span>' if row['Reçu envoyé']=="Oui" else '<span class="badge-attente">En attente</span>'
+                html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td style="font-size:0.82rem;">{row["Société"]}</td><td style="font-size:0.82rem;">{row["Mail"]}</td><td style="font-weight:700;color:{ROSE};">{row["Don (€)"]:,} €</td><td>{recu}</td></tr>'
+            html += "</table>"
+            st.markdown(html, unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align:right;margin-top:10px;font-family:Playfair Display,serif;">Total : <strong style="color:{ROSE};">{df_m["Don (€)"].sum():,} €</strong></div>', unsafe_allow_html=True)
     with tab_m2:
-        st.markdown(f'<div class="action-card"><div class="action-title">🎉 Inviter des mécènes à un événement</div></div>', unsafe_allow_html=True)
-        mec_liste  = [f"{r['Prénom']} {r['Nom']} – {r['Société']}" for _, r in df_mec.iterrows()]
-        selec_mec  = st.multiselect("Sélectionner les mécènes", mec_liste, default=mec_liste)
-        nom_event  = st.text_input("Nom de l'événement", placeholder="ex : Gala annuel HOPE 2025")
-        date_mec   = st.date_input("Date de l'événement", key="date_mec")
-        lieu_mec   = st.text_input("Lieu", placeholder="ex : Château de Versailles")
-
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown(f"""
-        <div class="action-card">
-            <div class="action-title">📎 Joindre un document à l'invitation (optionnel)</div>
-            <p style="font-size:0.83rem;color:{GRIS_TEXT};margin-bottom:0;">Programme de l'événement, carton d'invitation, plan d'accès…</p>
-        </div>
-        """, unsafe_allow_html=True)
-        fichier_invitation = st.file_uploader("Déposer un fichier à joindre", type=["pdf","png","jpg","docx"], key="inv_mec")
-
-        if st.button("📤 Envoyer les invitations", type="primary"):
-            extra = f" avec le fichier « {fichier_invitation.name} »" if fichier_invitation else ""
-            st.success(f"✅ Invitation pour « {nom_event} »{extra} envoyée à {len(selec_mec)} mécène(s) !")
-
+        mec_liste=[f"{r['Prénom']} {r['Nom']} – {r['Société']}" for _,r in df_mec.iterrows()]
+        sel_mec=st.multiselect("Mécènes",mec_liste,default=mec_liste)
+        nom_evt=st.text_input("Événement",placeholder="ex : Gala annuel HOPE 2025")
+        date_evt_m=st.date_input("Date",key="date_mec")
+        lieu_evt=st.text_input("Lieu",placeholder="ex : Château de Versailles")
+        st.markdown(f'<div class="action-card"><div class="action-title">📎 Joindre un document</div></div>', unsafe_allow_html=True)
+        fichier_inv=st.file_uploader("Document",type=["pdf","png","jpg","docx"],key="inv_mec")
+        if st.button("📤 Envoyer",type="primary"):
+            extra=f" + « {fichier_inv.name} »" if fichier_inv else ""
+            st.success(f"✅ Invitation « {nom_evt} »{extra} envoyée à {len(sel_mec)} mécène(s) !")
     with tab_m3:
-        st.markdown(f'<div class="action-card"><div class="action-title">🧾 Envoi du reçu fiscal & message de remerciement</div></div>', unsafe_allow_html=True)
-        mec_recu = st.selectbox("Sélectionner le mécène",
-            [f"{r['Prénom']} {r['Nom']} – {r['Société']} ({r['Don (€)']:,} €)" for _, r in df_mec.iterrows()])
-        msg = st.text_area("Message de remerciement",
-            value="Madame, Monsieur,\n\nNous vous remercions chaleureusement pour votre généreux soutien à l'association HOPE. Votre don nous permet de continuer à offrir des expériences uniques à nos bénéficiaires.\n\nVeuillez trouver ci-joint votre reçu fiscal.\n\nL'équipe HOPE",
-            height=150)
-        recu_file = st.file_uploader("Déposer le reçu fiscal (PDF)", type=["pdf"])
-        if st.button("📨 Envoyer le reçu fiscal + message", type="primary"):
-            if recu_file:
-                st.success(f"✅ Reçu « {recu_file.name} » et message envoyés à {mec_recu.split('–')[0].strip()} !")
-                st.balloons()
-            else:
-                st.warning("⚠️ Veuillez déposer le reçu fiscal avant d'envoyer.")
-    
+        mec_r=st.selectbox("Mécène",[f"{r['Prénom']} {r['Nom']} – {r['Société']} ({r['Don (€)']:,} €)" for _,r in df_mec.iterrows()])
+        msg_r=st.text_area("Message",value="Madame, Monsieur,\n\nNous vous remercions chaleureusement pour votre soutien à l'association HOPE.\nVeuillez trouver ci-joint votre reçu fiscal.\n\nL'équipe HOPE",height=120)
+        recu_f=st.file_uploader("Reçu fiscal (PDF)",type=["pdf"])
+        if st.button("📨 Envoyer",type="primary"):
+            if recu_f: st.success(f"✅ Envoyé à {mec_r.split('–')[0].strip()} !"); st.balloons()
+            else: st.warning("⚠️ Déposez le reçu fiscal.")
     with tab_m4:
-        st.markdown(f'<div class="action-card"><div class="action-title">➕ Ajouter un mécène manuellement</div></div>', unsafe_allow_html=True)
-
-        c1, c2 = st.columns(2)
+        st.markdown(f'<div class="action-card"><div class="action-title">➕ Ajouter un mécène</div></div>', unsafe_allow_html=True)
+        c1,c2=st.columns(2)
         with c1:
-            prenom_mec = st.text_input("Prénom", key="prenom_mec")
-            societe_mec = st.text_input("Société / Organisation", key="societe_mec")
-            siren_mec = st.text_input("SIREN", key="siren_mec")
-            don_mec = st.number_input("Montant du don (€)", min_value=0, step=100, key="don_mec")
+            prenom_m=st.text_input("Prénom *",key="pm"); societe_m=st.text_input("Société",key="sm")
+            don_num=st.number_input("Don numéraire (€)",min_value=0,step=1000,key="dn")
+            antenne_m=st.selectbox("Antenne *",antennes,key="am"); numero_m=st.text_input("Numéro de dossier",key="num_m")
         with c2:
-            nom_mec_new = st.text_input("Nom", key="nom_mec_new")
-            mail_mec = st.text_input("Mail", key="mail_mec")
-            recu_mec = st.selectbox("Reçu fiscal envoyé ?", ["Non", "Oui"], key="recu_mec")
-
-        note_mec = st.text_area("Notes (optionnel)", placeholder="Ex : intéressé par le gala, contact via Annabelle…", key="note_mec", height=100)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("✅ Ajouter le mécène", type="primary", key="btn_add_mec"):
-            if prenom_mec and nom_mec_new and mail_mec:
-                st.success(f"✅ Mécène {prenom_mec} {nom_mec_new} ({societe_mec}) ajouté avec un don de {don_mec:,} € !")
-            else:
-                st.warning("⚠️ Veuillez renseigner au minimum le prénom, le nom et le mail.")
-
-
+            nom_m=st.text_input("Nom *",key="nm"); mail_m=st.text_input("Mail *",key="mm")
+            mecen_comp=st.text_input("Mécénat en compétence (société/nom)",key="mc")
+            recu_m=st.selectbox("Reçu fiscal envoyé ?",["Non","Oui"],key="rm"); info_m=st.text_input("Info / Contact",key="im")
+        info_comp_m=st.text_area("Informations complémentaires",key="icm",height=80)
+        if st.button("✅ Ajouter",type="primary",key="btn_mec"):
+            if prenom_m and nom_m and mail_m: st.success(f"✅ {prenom_m} {nom_m} ajouté(e) — Don : {don_num:,} € — Antenne : {antenne_m} !")
+            else: st.warning("⚠️ Prénom, nom et mail obligatoires.")
+ 
+ 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PAGE : NEWSLETTER
+# PAGE : NEWSLETTER — compose à gauche, contacts à droite
 # ═══════════════════════════════════════════════════════════════════════════════
 elif "Newsletter" in page:
-    st.markdown('<span class="section-title">📰 Envoi de la newsletter</span>', unsafe_allow_html=True)
-
-    # Stats contacts
-    nb_ben   = sum(1 for r in beneficiaires_data if r["Mail"])
-    nb_benv  = sum(1 for r in benevoles_data if r["Mail"])
-    nb_mec   = len(mecenes_data)
-    nb_total = nb_ben + nb_benv + nb_mec
-
-    st.markdown(f"""
-    <div class="stat-row">
-        <div class="stat-chip"><div class="stat-chip-num">{nb_total}</div><div class="stat-chip-label">Total destinataires</div></div>
-        <div class="stat-chip" style="border-top-color:#8c0a3c;"><div class="stat-chip-num" style="color:#8c0a3c;">{nb_ben}</div><div class="stat-chip-label">Bénéficiaires</div></div>
-        <div class="stat-chip" style="border-top-color:#0a4a8c;"><div class="stat-chip-num" style="color:#0a4a8c;">{nb_benv}</div><div class="stat-chip-label">Bénévoles</div></div>
-        <div class="stat-chip" style="border-top-color:#5b2d8e;"><div class="stat-chip-num" style="color:#5b2d8e;">{nb_mec}</div><div class="stat-chip-label">Mécènes</div></div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col_left, col_right = st.columns([2, 1])
-
-    with col_left:
-        # Sélection des destinataires
-        st.markdown('<span class="section-title" style="font-size:1rem;">Sélection des destinataires</span>', unsafe_allow_html=True)
-
-        df_contacts = pd.DataFrame(tous_contacts)
-
-        filtre_type = st.multiselect("Filtrer par type",
-            ["Bénéficiaire", "Bénévole", "Mécène"],
-            default=["Bénéficiaire", "Bénévole", "Mécène"])
-
-        df_filtre = df_contacts[df_contacts["Type"].isin(filtre_type)]
-
-        html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Mail</th><th>Type</th></tr>'
-        for _, row in df_filtre.iterrows():
-            if row["Type"] == "Bénéficiaire": badge = '<span class="badge-beneficiaire">Bénéficiaire</span>'
-            elif row["Type"] == "Bénévole":   badge = '<span class="badge-benevole">Bénévole</span>'
-            else:                             badge = '<span class="badge-mecene">Mécène</span>'
-            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td style="font-size:0.82rem;">{row["Mail"]}</td><td>{badge}</td></tr>'
+    st.markdown(f'<div class="newsletter-hero"><h2>📰 Newsletter HOPE</h2><p style="opacity:0.85;">Envoyez votre newsletter à l\'ensemble de vos contacts en quelques clics</p></div>', unsafe_allow_html=True)
+ 
+    nb_ben  = sum(1 for r in beneficiaires_data if r["Mail"])
+    nb_benv = sum(1 for r in benevoles_data if r["Mail"])
+    nb_mec  = len(mecenes_data)
+    st.markdown(f'<div class="stat-row"><div class="stat-chip"><div class="stat-chip-num">{nb_ben+nb_benv+nb_mec}</div><div class="stat-chip-label">Total destinataires</div></div><div class="stat-chip" style="border-top-color:#8c0a3c;"><div class="stat-chip-num" style="color:#8c0a3c;">{nb_ben}</div><div class="stat-chip-label">Bénéficiaires</div></div><div class="stat-chip" style="border-top-color:#0a4a8c;"><div class="stat-chip-num" style="color:#0a4a8c;">{nb_benv}</div><div class="stat-chip-label">Bénévoles</div></div><div class="stat-chip" style="border-top-color:#5b2d8e;"><div class="stat-chip-num" style="color:#5b2d8e;">{nb_mec}</div><div class="stat-chip-label">Mécènes</div></div></div>', unsafe_allow_html=True)
+ 
+    # Deux colonnes : compose à gauche (plus large), liste contacts à droite
+    col_compose, col_contacts = st.columns([3, 2])
+ 
+    with col_compose:
+        st.markdown('<span class="section-title">✉️ Composer et envoyer</span>', unsafe_allow_html=True)
+        st.markdown('<div class="newsletter-compose-card">', unsafe_allow_html=True)
+ 
+        st.markdown("**📎 Fichier newsletter**")
+        nws_file = st.file_uploader("", type=["pdf","png","jpg","jpeg","docx"], label_visibility="collapsed", key="nws_file")
+        if nws_file:
+            st.success(f"✅ Fichier chargé : {nws_file.name}")
+ 
+        objet = st.text_input("📌 Objet", placeholder="Newsletter HOPE – Été 2025")
+        msg_nws = st.text_area("💬 Message d'accompagnement", value="Bonjour,\n\nVeuillez trouver ci-joint la newsletter HOPE de cet été.\n\nBonne lecture !\n\nL'équipe HOPE", height=140)
+ 
+        st.markdown("</div>", unsafe_allow_html=True)
+ 
+        # Filtres destinataires (sous le compose)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<span class="section-title" style="font-size:1rem;">🎯 Filtrer les destinataires</span>', unsafe_allow_html=True)
+        c1, c2 = st.columns(2)
+        with c1:
+            filtre_type = st.multiselect("Type", ["Bénéficiaire","Bénévole","Mécène"], default=["Bénéficiaire","Bénévole","Mécène"])
+        with c2:
+            filtre_ant = st.multiselect("Antenne", antennes, default=antennes)
+ 
+        df_c = pd.DataFrame(tous_contacts)
+        df_c = df_c[df_c["Type"].isin(filtre_type) & df_c["Antenne"].isin(filtre_ant)]
+        nb_dest = len(df_c)
+ 
+        st.markdown(f'<div style="background:{GRIS_FOND};border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:0.88rem;color:{GRIS_TEXT};">👥 <strong style="color:{NOIR};">{nb_dest} destinataire(s)</strong> sélectionné(s) après filtrage</div>', unsafe_allow_html=True)
+ 
+        if st.button(f"📤 Envoyer à {nb_dest} destinataire(s)", type="primary", use_container_width=True):
+            if nws_file and objet:
+                st.success(f"✅ Newsletter envoyée à {nb_dest} contact(s) !")
+                st.balloons()
+            elif not nws_file:
+                st.warning("⚠️ Déposez d'abord le fichier newsletter.")
+            else:
+                st.warning("⚠️ Renseignez l'objet du mail.")
+ 
+    with col_contacts:
+        st.markdown('<span class="section-title">📋 Liste des contacts</span>', unsafe_allow_html=True)
+        st.markdown('<div class="contacts-panel">', unsafe_allow_html=True)
+        html = f'<table class="data-table" style="font-size:0.8rem;"><tr><th>Prénom</th><th>Nom</th><th>Type</th><th>Antenne</th></tr>'
+        for _, row in df_c.iterrows():
+            if row["Type"]=="Bénéficiaire": b='<span class="badge-beneficiaire">Bénéf.</span>'
+            elif row["Type"]=="Bénévole":   b='<span class="badge-benevole">Bénév.</span>'
+            else:                           b='<span class="badge-mecene">Mécène</span>'
+            ant_short = row["Antenne"].split("–")[0].strip()
+            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{b}</td><td style="font-size:0.75rem;color:{GRIS_TEXT};">{ant_short}</td></tr>'
         html += "</table>"
         st.markdown(html, unsafe_allow_html=True)
-
-    with col_right:
-        st.markdown('<span class="section-title" style="font-size:1rem;">Envoi</span>', unsafe_allow_html=True)
-
-        st.markdown(f"""
-        <div class="newsletter-zone">
-            <div class="newsletter-icon">📄</div>
-            <div style="font-weight:600;font-size:0.9rem;color:{NOIR};margin-bottom:4px;">Déposer la newsletter</div>
-            <div style="font-size:0.8rem;color:{GRIS_TEXT};">PDF, image ou document Word</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        newsletter_file = st.file_uploader("", type=["pdf","png","jpg","jpeg","docx"], label_visibility="collapsed")
-
-        objet_mail = st.text_input("Objet du mail", placeholder="ex : Newsletter HOPE – Juin 2025")
-
-        msg_news = st.text_area("Message d'accompagnement",
-            value="Bonjour,\n\nVeuillez trouver ci-joint la newsletter de l'association HOPE.\n\nBonne lecture !\n\nL'équipe HOPE",
-            height=130)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        nb_dest = len(df_filtre)
-        if st.button(f"📤 Envoyer à {nb_dest} destinataire(s)", type="primary", use_container_width=True):
-            if newsletter_file and objet_mail:
-                st.success(f"✅ Newsletter « {newsletter_file.name} » envoyée à {nb_dest} destinataire(s) !")
-                st.balloons()
-            elif not newsletter_file:
-                st.warning("⚠️ Veuillez déposer le fichier de la newsletter.")
+        st.markdown('</div>', unsafe_allow_html=True)
+ 
+ 
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE : GROUPES
+# ═══════════════════════════════════════════════════════════════════════════════
+elif "Groupes" in page:
+    st.markdown('<span class="section-title">💬 Groupes Famille HOPE — Administrateurs</span>', unsafe_allow_html=True)
+    groupe_sel=st.selectbox("Groupe",[g["nom"] for g in groupes_wa])
+    groupe=next(g for g in groupes_wa if g["nom"]==groupe_sel)
+    col_g1,col_g2=st.columns([2,1])
+    with col_g1:
+        st.markdown(f"<p style='font-size:0.82rem;color:{GRIS_TEXT};margin-bottom:16px;'>👥 {', '.join(groupe['membres'])}</p>", unsafe_allow_html=True)
+        for msg in groupe["messages"]:
+            if msg["type"]=="vocal":
+                st.markdown(f'<div class="vocal-block"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="font-size:1.2rem;">🎙️</span><div><span style="font-weight:700;color:{NOIR};">{msg["auteur"]}</span><span style="font-size:0.75rem;color:{GRIS_TEXT};margin-left:8px;">{msg["heure"]} · {msg["duree"]}</span></div><span style="margin-left:auto;background:#f59e0b;color:white;font-size:0.7rem;padding:2px 8px;border-radius:20px;">🎙️ Transcription IA</span></div><div style="background:white;border-radius:8px;padding:12px;font-size:0.85rem;line-height:1.7;border-left:3px solid #f59e0b;">« {msg["transcription"]} »</div></div>', unsafe_allow_html=True)
             else:
-                st.warning("⚠️ Veuillez renseigner l'objet du mail.")
+                st.markdown(f'<div class="transcript-block"><span style="font-weight:700;color:{NOIR};">{msg["auteur"]}</span><span style="font-size:0.75rem;color:#7c3aed;margin-left:8px;">{msg["heure"]}</span><div style="margin-top:6px;">{msg["contenu"]}</div></div>', unsafe_allow_html=True)
+    with col_g2:
+        st.markdown('<span class="section-title" style="font-size:1rem;">⚡ Infos importantes</span>', unsafe_allow_html=True)
+        for info in groupe["infos_importantes"]:
+            st.markdown(f'<div class="info-importante">⚠️ {info}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card" style="margin-top:16px;"><div class="kpi-number">{len(groupe["messages"])}</div><div class="kpi-label">Messages</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card" style="border-left-color:#f59e0b;"><div class="kpi-number" style="color:#f59e0b;">{sum(1 for m in groupe["messages"] if m["type"]=="vocal")}</div><div class="kpi-label">Vocaux transcrits</div></div>', unsafe_allow_html=True)
+ 
+ 
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE : ANTENNES
+# ═══════════════════════════════════════════════════════════════════════════════
+elif "Antennes" in page:
+    st.markdown('<span class="section-title">📍 Espace Antennes</span>', unsafe_allow_html=True)
+    tab_a1,tab_a2=st.tabs(["🗺️ Nos antennes","📋 Guide Antenne"])
+    with tab_a1:
+        # ── Tableau des responsables ──
+        st.markdown('<span class="section-title" style="font-size:1.1rem;">📞 Responsables d\'antenne</span>', unsafe_allow_html=True)
+        ant_profil_filtre = profil["antenne"]
+        respos_show = respos_antenne if ant_profil_filtre == "Toutes" else [r for r in respos_antenne if r["antenne"] == ant_profil_filtre]
+        for r in respos_show:
+            tel_part = f'<a class="btn-tel" href="tel:{r["tel"].replace(" ","")}" style="text-decoration:none;">📞 {r["tel"]}</a>' if r["tel"] != "—" else '<span style="font-size:0.8rem;color:#aaa;">Tél. non renseigné</span>'
+            st.markdown(f"""
+            <div class="antenne-respo-card">
+                <div class="antenne-respo-info">
+                    <div class="antenne-respo-name">{r['emoji']} {r['nom']}</div>
+                    <div class="antenne-respo-ant">{r['antenne']}</div>
+                    <div style="font-size:0.78rem;color:{GRIS_TEXT};margin-top:2px;">✉️ {r['mail']}</div>
+                </div>
+                <div class="antenne-respo-actions">
+                    <a class="btn-mail" href="mailto:{r['mail']}?subject=HOPE - Contact responsable antenne" style="text-decoration:none;">✉️ Envoyer un mail</a>
+                    {tel_part}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+ 
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<span class="section-title" style="font-size:1.1rem;">🗺️ Fiches antennes</span>', unsafe_allow_html=True)
+ 
+        for ant in antennes_data:
+            with st.expander(f"{ant['emoji']}  {ant['nom']}", expanded=False):
+                col_i,col_m=st.columns([2,1])
+                with col_i:
+                    st.markdown(f'<div class="antenne-card"><div style="font-size:2.5rem;">{ant["emoji"]}</div><div style="font-weight:700;font-size:1.1rem;color:{NOIR};margin:8px 0;">{ant["nom"]}</div><div style="font-size:0.88rem;color:{GRIS_TEXT};line-height:1.6;">{ant["description"]}</div><div style="font-size:0.85rem;margin-top:10px;">📍 {ant["localisation"]}</div></div>', unsafe_allow_html=True)
+                with col_m:
+                    st.markdown(f"<div style='font-weight:700;margin-bottom:10px;'>👥 Équipe</div>", unsafe_allow_html=True)
+                    for m in ant["membres"]: st.markdown(f"<div style='background:{GRIS_FOND};border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:0.85rem;'>👤 {m}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='font-weight:700;margin:10px 0 6px;'>🐴 Centres partenaires</div>", unsafe_allow_html=True)
+                    for c in centres.get(ant["nom"],[]): st.markdown(f"<div style='font-size:0.82rem;padding:4px 0 4px 12px;color:{GRIS_TEXT};'>🐴 {c}</div>", unsafe_allow_html=True)
+    with tab_a2:
+        for icon,titre,contenu in [
+            ("🚀","Démarrer avec le CRM","Connectez-vous avec votre profil antenne. Le dashboard s'adapte à votre rôle."),
+            ("💬","WhatsApp","Continuez vos groupes habituels. L'API récupère automatiquement les données."),
+            ("🧒","Bénéficiaires","Toutes sont bénévoles potentielles. Vous pouvez déclencher une proposition directement."),
+            ("👥","Bénévoles","Ajoutez manuellement ou convertissez une bénéficiaire. Distinguez réguliers et événementiels."),
+            ("📰","Newsletter","Déposez un PDF et sélectionnez vos destinataires. Envoi automatique."),
+            ("🆘","Support","Contactez Annabelle ou Sandrine via l'Accueil → Responsables des antennes."),
+        ]:
+            st.markdown(f'<div class="action-card"><div class="action-title">{icon} {titre}</div><div style="font-size:0.85rem;color:{GRIS_TEXT};">{contenu}</div></div>', unsafe_allow_html=True)
+ 
+ 
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE : PHOTOS
+# ═══════════════════════════════════════════════════════════════════════════════
+elif "Photos" in page:
+    st.markdown('<span class="section-title">📷 Albums photos</span>', unsafe_allow_html=True)
+    ant_photo=st.selectbox("📍 Antenne",["Toutes"]+antennes)
+    photos_f=[p for p in photos_data if ant_photo in ["Toutes",p["antenne"],"Toutes antennes"]]
+    cols=st.columns(2)
+    for i,photo in enumerate(photos_f):
+        with cols[i%2]:
+            st.markdown(f'<div class="photo-card"><div style="background:linear-gradient(135deg,{NOIR} 0%,{ROSE} 100%);height:130px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;">{photo["emoji"]}</div><div style="padding:14px;"><div style="font-weight:700;font-size:0.95rem;color:{NOIR};">{photo["titre"]}</div><div style="font-size:0.78rem;color:{GRIS_TEXT};margin:4px 0;">📅 {photo["date"]} · 📍 {photo["antenne"]}</div><div style="font-size:0.82rem;color:{GRIS_TEXT};">{photo["description"]}</div></div></div><br>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<span class="section-title" style="font-size:1rem;">📤 Ajouter des photos</span>', unsafe_allow_html=True)
+    c1,c2,c3=st.columns(3)
+    with c1: titre_p=st.text_input("Titre de l'album")
+    with c2: ant_p=st.selectbox("Antenne",antennes,key="ant_photo")
+    with c3: date_p=st.date_input("Date",key="date_photo")
+    photos_up=st.file_uploader("Photos",type=["jpg","jpeg","png"],accept_multiple_files=True)
+    if st.button("📁 Créer l'album",type="primary"):
+        if titre_p and photos_up: st.success(f"✅ Album « {titre_p} » créé avec {len(photos_up)} photo(s) !")
+        else: st.warning("⚠️ Titre et photos obligatoires.")

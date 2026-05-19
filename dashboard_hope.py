@@ -115,7 +115,7 @@ centres = {
  
 # Responsables par antenne avec mail et téléphone
 respos_antenne = [
-    {"nom":"Annabelle Marchand","antenne":"Paris – Île-de-France",         "mail":"annabelle.marchand@association-hope.fr","tel":"06 12 34 56 78","emoji":"🗼"},
+    {"nom":"Annabel Marchand","antenne":"Paris – Île-de-France",         "mail":"annabel.marchand@association-hope.fr","tel":"06 12 34 56 78","emoji":"🗼"},
     {"nom":"Gilles Tournebrise", "antenne":"Lyon – Auvergne-Rhône-Alpes",  "mail":"gilles.tournebrise@association-hope.fr","tel":"06 23 45 67 89","emoji":"🦁"},
     {"nom":"Sandrine Azoulay",   "antenne":"Marseille – PACA",             "mail":"sandrine.azoulay@association-hope.fr", "tel":"06 34 56 78 90","emoji":"🌊"},
     {"nom":"Emeline Courtet",    "antenne":"Bordeaux – Nouvelle-Aquitaine","mail":"emeline.courtet@association-hope.fr",  "tel":"06 45 67 89 01","emoji":"🍷"},
@@ -123,7 +123,7 @@ respos_antenne = [
 ]
  
 antennes_data = [
-    {"nom":"Paris – Île-de-France",         "emoji":"🗼","description":"Antenne historique fondée en 2015, la plus grande avec 3 centres partenaires.","localisation":"Paris 75, 92, 93, 94","membres":["Annabelle (Resp.)","Marie D.","Claire B.","Sophie R.","Laurence P.","Nathalie V."],"couleur":ROSE},
+    {"nom":"Paris – Île-de-France",         "emoji":"🗼","description":"Antenne historique fondée en 2015, la plus grande avec 3 centres partenaires.","localisation":"Paris 75, 92, 93, 94","membres":["Annabel (Resp.)","Marie D.","Claire B.","Sophie R.","Laurence P.","Nathalie V."],"couleur":ROSE},
     {"nom":"Lyon – Auvergne-Rhône-Alpes",   "emoji":"🦁","description":"Créée en 2018, très active sur les séjours découverte.","localisation":"Lyon 69, Villeurbanne","membres":["Gilles (Coord.)","Thomas M.","Julie R.","Marc S."],"couleur":"#1D9E75"},
     {"nom":"Marseille – PACA",              "emoji":"🌊","description":"Ouverte en 2019. Forte dynamique associative et nombreux partenariats.","localisation":"Marseille 13, Aix-en-Provence","membres":["Sandrine (Sec.)","Lucas P.","Nadia E.","Karim B."],"couleur":"#378ADD"},
     {"nom":"Bordeaux – Nouvelle-Aquitaine", "emoji":"🍷","description":"Antenne en pleine croissance (2021), forte présence rurale.","localisation":"Bordeaux 33, Bayonne 64","membres":["Emeline (Coord.)","Pauline D.","Romain F."],"couleur":"#BA7517"},
@@ -131,19 +131,21 @@ antennes_data = [
 ]
  
 # Données réalistes : asso proche de 1M€ de dons, centaines de bénévoles
+evenements = ["Journée Découverte Versailles – Mai 2025", "Séjour Été 2025", "Séjour Printemps 2025", "Séjour Hiver 2025", "Gala des Mécènes 2024"]
+ 
 beneficiaires_data = [
-    {"Prénom":"Emma",      "Nom":"Laurent",    "Téléphone":"06 12 34 56 78","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"emma.l@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
-    {"Prénom":"Chloé",     "Nom":"Martin",     "Téléphone":"06 34 56 78 90","Séjour":"Été 2025",      "Antenne":"Marseille – PACA",               "Mail":"chloe.m@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Léa",       "Nom":"Rousseau",   "Téléphone":"06 56 78 90 12","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"lea.r@mail.com",      "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Inès",      "Nom":"Dubois",     "Téléphone":"06 78 90 12 34","Séjour":"Printemps 2025","Antenne":"Lyon – Auvergne-Rhône-Alpes",    "Mail":"ines.d@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
-    {"Prénom":"Camille",   "Nom":"Perrin",     "Téléphone":"06 89 01 23 45","Séjour":"Hiver 2025",    "Antenne":"Bordeaux – Nouvelle-Aquitaine",  "Mail":"",                    "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Zoé",       "Nom":"Fontaine",   "Téléphone":"06 90 12 34 56","Séjour":"Été 2025",      "Antenne":"Rennes – Bretagne",              "Mail":"zoe.f@mail.com",      "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Sarah",     "Nom":"Benali",     "Téléphone":"06 11 22 33 44","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"sarah.b@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Jade",      "Nom":"Chevalier",  "Téléphone":"06 22 33 44 55","Séjour":"Printemps 2025","Antenne":"Lyon – Auvergne-Rhône-Alpes",    "Mail":"jade.c@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
-    {"Prénom":"Manon",     "Nom":"Lefebvre",   "Téléphone":"06 33 44 55 66","Séjour":"Hiver 2025",    "Antenne":"Marseille – PACA",               "Mail":"manon.l@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Ambre",     "Nom":"Dupré",      "Téléphone":"06 44 55 66 77","Séjour":"Été 2025",      "Antenne":"Bordeaux – Nouvelle-Aquitaine",  "Mail":"ambre.d@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Yasmine",   "Nom":"Ait Hamou",  "Téléphone":"06 55 66 77 88","Séjour":"Été 2025",      "Antenne":"Paris – Île-de-France",         "Mail":"yasmine.a@mail.com",  "Source":"WhatsApp","Potentielle_benv":"Oui"},
-    {"Prénom":"Lola",      "Nom":"Girard",     "Téléphone":"06 66 77 88 99","Séjour":"Printemps 2025","Antenne":"Rennes – Bretagne",              "Mail":"lola.g@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée"},
+    {"Prénom":"Emma",      "Nom":"Laurent",    "Téléphone":"06 12 34 56 78","Séjour":"Été 2025",      "Événement":"Séjour Été 2025",                    "Antenne":"Paris – Île-de-France",         "Mail":"emma.l@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée","Inscription":"Confirmée"},
+    {"Prénom":"Chloé",     "Nom":"Martin",     "Téléphone":"06 34 56 78 90","Séjour":"Été 2025",      "Événement":"Séjour Été 2025",                    "Antenne":"Marseille – PACA",               "Mail":"chloe.m@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"En attente"},
+    {"Prénom":"Léa",       "Nom":"Rousseau",   "Téléphone":"06 56 78 90 12","Séjour":"Été 2025",      "Événement":"Journée Découverte Versailles – Mai 2025","Antenne":"Paris – Île-de-France",     "Mail":"lea.r@mail.com",      "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"Confirmée"},
+    {"Prénom":"Inès",      "Nom":"Dubois",     "Téléphone":"06 78 90 12 34","Séjour":"Printemps 2025","Événement":"Séjour Printemps 2025",               "Antenne":"Lyon – Auvergne-Rhône-Alpes",    "Mail":"ines.d@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée","Inscription":"Confirmée"},
+    {"Prénom":"Camille",   "Nom":"Perrin",     "Téléphone":"06 89 01 23 45","Séjour":"Hiver 2025",    "Événement":"Séjour Hiver 2025",                   "Antenne":"Bordeaux – Nouvelle-Aquitaine",  "Mail":"",                    "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"En attente"},
+    {"Prénom":"Zoé",       "Nom":"Fontaine",   "Téléphone":"06 90 12 34 56","Séjour":"Été 2025",      "Événement":"Séjour Été 2025",                    "Antenne":"Rennes – Bretagne",              "Mail":"zoe.f@mail.com",      "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"Confirmée"},
+    {"Prénom":"Sarah",     "Nom":"Benali",     "Téléphone":"06 11 22 33 44","Séjour":"Été 2025",      "Événement":"Journée Découverte Versailles – Mai 2025","Antenne":"Paris – Île-de-France",     "Mail":"sarah.b@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"En attente"},
+    {"Prénom":"Jade",      "Nom":"Chevalier",  "Téléphone":"06 22 33 44 55","Séjour":"Printemps 2025","Événement":"Séjour Printemps 2025",               "Antenne":"Lyon – Auvergne-Rhône-Alpes",    "Mail":"jade.c@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée","Inscription":"Confirmée"},
+    {"Prénom":"Manon",     "Nom":"Lefebvre",   "Téléphone":"06 33 44 55 66","Séjour":"Hiver 2025",    "Événement":"Séjour Hiver 2025",                   "Antenne":"Marseille – PACA",               "Mail":"manon.l@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"En attente"},
+    {"Prénom":"Ambre",     "Nom":"Dupré",      "Téléphone":"06 44 55 66 77","Séjour":"Été 2025",      "Événement":"Séjour Été 2025",                    "Antenne":"Bordeaux – Nouvelle-Aquitaine",  "Mail":"ambre.d@mail.com",    "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"Confirmée"},
+    {"Prénom":"Yasmine",   "Nom":"Ait Hamou",  "Téléphone":"06 55 66 77 88","Séjour":"Été 2025",      "Événement":"Journée Découverte Versailles – Mai 2025","Antenne":"Paris – Île-de-France",     "Mail":"yasmine.a@mail.com",  "Source":"WhatsApp","Potentielle_benv":"Oui",       "Inscription":"Confirmée"},
+    {"Prénom":"Lola",      "Nom":"Girard",     "Téléphone":"06 66 77 88 99","Séjour":"Printemps 2025","Événement":"Séjour Printemps 2025",               "Antenne":"Rennes – Bretagne",              "Mail":"lola.g@mail.com",     "Source":"WhatsApp","Potentielle_benv":"Contactée","Inscription":"En attente"},
 ]
  
 benevoles_data = [
@@ -189,18 +191,18 @@ mecenes_data = [
 ]
  
 classement = [
-    {"rang":"🥇","nom":"Annabelle","role":"Responsable",  "init":"AN","heures":47,"bg":"#F4C0D1","txt":"#993556"},
+    {"rang":"🥇","nom":"Annabel","role":"Responsable",  "init":"AN","heures":47,"bg":"#F4C0D1","txt":"#993556"},
     {"rang":"🥈","nom":"Gilles",   "role":"Terrain",      "init":"GI","heures":38,"bg":"#9FE1CB","txt":"#0F6E56"},
     {"rang":"🥉","nom":"Sandrine", "role":"Secrétariat",  "init":"SA","heures":29,"bg":"#B5D4F4","txt":"#185FA5"},
     {"rang":"4️⃣","nom":"Emeline",  "role":"Événementiel", "init":"EM","heures":21,"bg":"#FAC775","txt":"#854F0B"},
 ]
  
 profils = {
-    "Annabelle – Responsable nationale": {"role":"responsable","antenne":"Toutes","acces":["accueil","beneficiaires","benevoles","mecenes","newsletter","groupes","antennes","photos"]},
-    "Gilles – Antenne Lyon":             {"role":"antenne",    "antenne":"Lyon – Auvergne-Rhône-Alpes","acces":["accueil","beneficiaires","benevoles","antennes"]},
-    "Sandrine – Secrétariat":            {"role":"secretariat","antenne":"Toutes","acces":["accueil","beneficiaires","benevoles","mecenes","newsletter","antennes"]},
+    "Annabel – Responsable nationale": {"role":"responsable","antenne":"Toutes","acces":["accueil","groupes","beneficiaires","benevoles","mecenes","newsletter","antennes","photos"]},
+    "Gilles – Antenne Lyon":             {"role":"antenne",    "antenne":"Lyon – Auvergne-Rhône-Alpes","acces":["accueil","groupes","beneficiaires","benevoles","antennes","photos"]},
+    "Sandrine – Secrétariat":            {"role":"secretariat","antenne":"Toutes","acces":["accueil","groupes","beneficiaires","benevoles","mecenes","newsletter","antennes","photos"]},
     "Emeline – Communication":           {"role":"communication","antenne":"Toutes","acces":["accueil","newsletter","photos","antennes"]},
-    "Laurence – Antenne Paris":          {"role":"antenne",    "antenne":"Paris – Île-de-France","acces":["accueil","beneficiaires","benevoles","antennes"]},
+    "Laurence – Antenne Paris":          {"role":"antenne",    "antenne":"Paris – Île-de-France","acces":["accueil","groupes","beneficiaires","benevoles","antennes","photos"]},
 }
  
 tous_contacts = []
@@ -212,15 +214,15 @@ for r in mecenes_data:
     tous_contacts.append({"Prénom":r["Prénom"],"Nom":r["Nom"],"Mail":r["Mail"],"Type":"Mécène","Antenne":r["Antenne"]})
  
 groupes_wa = [
-    {"nom":"Groupe Administrateurs HOPE","membres":["Annabelle","Gilles","Sandrine","Emeline","Laurence"],
+    {"nom":"Groupe Administrateurs HOPE","membres":["Annabel","Gilles","Sandrine","Emeline","Laurence"],
      "infos_importantes":["Budget Q2 validé à 85% — vigilance frais transport","Nouvelle réglementation équestre dès sept. 2025","Recrutement coordinateur Rennes — 3 candidatures reçues"],
      "messages":[
-         {"auteur":"Annabelle","heure":"09:14","type":"texte","contenu":"Bonjour à tous, le dossier de subvention région IDF a été déposé hier. On attend retour sous 6 semaines."},
+         {"auteur":"Annabel","heure":"09:14","type":"texte","contenu":"Bonjour à tous, le dossier de subvention région IDF a été déposé hier. On attend retour sous 6 semaines."},
          {"auteur":"Gilles","heure":"09:32","type":"vocal","duree":"1min 24s","transcription":"Salut tout le monde. J'ai eu le responsable du centre de Lyon hier soir. Il confirme les dates pour le séjour de juillet. Par contre il nous demande si on peut anticiper le versement de l'acompte avant le 15 juin, sinon il ne peut pas garantir la disponibilité des chevaux. Faut valider ça rapidement."},
-         {"auteur":"Sandrine","heure":"10:05","type":"texte","contenu":"Reçu Gilles. Je prépare le bon de commande aujourd'hui. Annabelle tu peux valider la dépense ? L'acompte c'est 800€."},
-         {"auteur":"Annabelle","heure":"10:18","type":"texte","contenu":"Oui validé. Sandrine envoie-moi le bon pour signature avant midi stp."},
+         {"auteur":"Sandrine","heure":"10:05","type":"texte","contenu":"Reçu Gilles. Je prépare le bon de commande aujourd'hui. Annabel tu peux valider la dépense ? L'acompte c'est 800€."},
+         {"auteur":"Annabel","heure":"10:18","type":"texte","contenu":"Oui validé. Sandrine envoie-moi le bon pour signature avant midi stp."},
      ]},
-    {"nom":"Groupe Coordination Séjours","membres":["Annabelle","Gilles","Laurence","Marie D."],
+    {"nom":"Groupe Coordination Séjours","membres":["Annabel","Gilles","Laurence","Marie D."],
      "infos_importantes":["Séjour été 2025 : 38 bénéficiaires confirmées, 4 places restantes","Transport 14 juillet non résolu — urgent","3 accompagnateurs manquants week-end du 21"],
      "messages":[
          {"auteur":"Laurence","heure":"08:45","type":"texte","contenu":"Bonjour équipe. J'ai finalisé la liste des bénéficiaires pour le séjour été. On a 38 jeunes confirmées, il reste 4 places."},
@@ -239,8 +241,8 @@ photos_data = [
  
 # ─── NAVIGATION STATE ──────────────────────────────────────────────────────────
 menu_labels = {
-    "accueil":"🏠  Accueil","beneficiaires":"🧒  Bénéficiaires","benevoles":"👥  Bénévoles",
-    "mecenes":"💼  Mécènes","newsletter":"📰  Newsletter","groupes":"💬  Groupes Famille HOPE",
+    "accueil":"🏠  Accueil","groupes":"💬  Transcription Groupe HOPE","beneficiaires":"🧒  Bénéficiaires",
+    "benevoles":"👥  Bénévoles","mecenes":"💼  Mécènes","newsletter":"📰  Newsletter",
     "antennes":"📍  Antennes","photos":"📷  Photos",
 }
 menu_labels_inv = {v: k for k, v in menu_labels.items()}  # label → key
@@ -335,39 +337,57 @@ st.markdown(f"""
 if "Accueil" in page:
     role = profil["role"]
     antenne_profil = profil["antenne"]
-    df_benv_acc = pd.DataFrame(benevoles_data)
-    df_ben_acc  = pd.DataFrame(beneficiaires_data)
-    if antenne_profil != "Toutes":
-        df_benv_acc = df_benv_acc[df_benv_acc["Antenne"] == antenne_profil]
-        df_ben_acc  = df_ben_acc[df_ben_acc["Antenne"] == antenne_profil]
  
-    # ── KPIs globaux ──
-    if role in ["responsable","secretariat"]:
-        nb_reg = len([b for b in benevoles_data if b["Type"]=="Régulier"])
-        nb_evt = len([b for b in benevoles_data if b["Type"]=="Événementiel"])
-        total_dons = sum(m["Don (€)"] for m in mecenes_data)
-        col1,col2,col3,col4,col5 = st.columns(5)
-        kpis = [
-            (col1, str(len(beneficiaires_data)), "Bénéficiaires accompagnées", ROSE),
-            (col2, str(nb_reg + nb_evt), "Bénévoles actifs", "#1a3a6b"),
-            (col3, str(len(mecenes_data)), "Mécènes", "#BA7517"),
-            (col4, f"{total_dons//1000}k €", "Dons collectés", "#1D9E75"),
-            (col5, str(len(tous_contacts)), "Contacts mail", GRIS_TEXT),
-        ]
-        for col,num,label,couleur in kpis:
-            with col: st.markdown(f'<div class="kpi-card" style="border-left-color:{couleur};"><div class="kpi-number" style="color:{couleur};">{num}</div><div class="kpi-label">{label}</div></div>', unsafe_allow_html=True)
-    elif role == "antenne":
-        nb_reg  = len(df_benv_acc[df_benv_acc["Type"]=="Régulier"])
-        nb_evt  = len(df_benv_acc[df_benv_acc["Type"]=="Événementiel"])
-        col1,col2,col3 = st.columns(3)
-        with col1: st.markdown(f'<div class="kpi-card"><div class="kpi-number">{len(df_ben_acc)}</div><div class="kpi-label">Bénéficiaires</div></div>', unsafe_allow_html=True)
-        with col2: st.markdown(f'<div class="kpi-card" style="border-left-color:#1a3a6b;"><div class="kpi-number" style="color:#1a3a6b;">{nb_reg}</div><div class="kpi-label">Bénévoles réguliers</div></div>', unsafe_allow_html=True)
-        with col3: st.markdown(f'<div class="kpi-card" style="border-left-color:#7c3aed;"><div class="kpi-number" style="color:#7c3aed;">{nb_evt}</div><div class="kpi-label">Bénévoles événementiels</div></div>', unsafe_allow_html=True)
-    elif role == "communication":
-        col1,col2,col3 = st.columns(3)
-        with col1: st.markdown(f'<div class="kpi-card"><div class="kpi-number">{len(tous_contacts)}</div><div class="kpi-label">Contacts avec mail</div></div>', unsafe_allow_html=True)
-        with col2: st.markdown(f'<div class="kpi-card"><div class="kpi-number">4</div><div class="kpi-label">Albums photos</div></div>', unsafe_allow_html=True)
-        with col3: st.markdown(f'<div class="kpi-card"><div class="kpi-number">3</div><div class="kpi-label">Newsletters envoyées</div></div>', unsafe_allow_html=True)
+    # ── Infos importantes WhatsApp (remplacent les KPIs) ──
+    # On collecte toutes les infos importantes de tous les groupes accessibles
+    all_infos = []
+    for g in groupes_wa:
+        for info in g["infos_importantes"]:
+            all_infos.append({"info": info, "groupe": g["nom"]})
+ 
+    st.markdown('<span class="section-title">⚡ Infos importantes — Groupes HOPE</span>', unsafe_allow_html=True)
+    st.markdown(f'<div class="wa-source" style="margin-bottom:16px;"><span>💬</span><span>Remontées automatiquement depuis les <strong>groupes WhatsApp HOPE</strong></span></div>', unsafe_allow_html=True)
+ 
+    cols_inf = st.columns(2)
+    for i, item in enumerate(all_infos):
+        with cols_inf[i % 2]:
+            st.markdown(f"""
+            <div style="background:{BLANC};border-radius:12px;padding:14px 18px;margin-bottom:10px;
+                        border-left:4px solid {ROSE};box-shadow:0 2px 10px rgba(232,24,109,0.07);">
+                <div style="font-size:0.72rem;color:{GRIS_TEXT};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">
+                    💬 {item['groupe']}
+                </div>
+                <div style="font-size:0.88rem;color:{NOIR};font-weight:500;">⚠️ {item['info']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+ 
+    st.markdown("<br>", unsafe_allow_html=True)
+ 
+    # ── Actualité — retour en images ──
+    if "photos" in profil["acces"]:
+        dernier_album = photos_data[1]  # Journée Découverte Paris - Mai 2025, le plus récent
+        st.markdown('<span class="section-title">📸 Actualité — Retour en images</span>', unsafe_allow_html=True)
+        col_actu, col_actu_btn = st.columns([3, 1])
+        with col_actu:
+            st.markdown(f"""
+            <div style="background:linear-gradient(135deg,{NOIR} 0%,{ROSE} 100%);border-radius:16px;
+                        padding:28px 32px;color:white;display:flex;align-items:center;gap:24px;">
+                <div style="font-size:4rem;">{dernier_album['emoji']}</div>
+                <div>
+                    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;margin-bottom:6px;">
+                        {dernier_album['titre']}
+                    </div>
+                    <div style="opacity:0.8;font-size:0.88rem;margin-bottom:6px;">
+                        📅 {dernier_album['date']} · 📍 {dernier_album['antenne']}
+                    </div>
+                    <div style="font-size:0.85rem;opacity:0.9;">{dernier_album['description']}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with col_actu_btn:
+            st.markdown("<br><br>", unsafe_allow_html=True)
+            if st.button("📷 Voir tous les albums", key="btn_photos_actu", use_container_width=True, type="primary"):
+                navigate_to("photos")
  
     st.markdown("<br>", unsafe_allow_html=True)
  
@@ -380,7 +400,7 @@ if "Accueil" in page:
         "beneficiaires": ("🧒", "Bénéficiaires",    "Gérer les jeunes accompagnées"),
         "benevoles":     ("👥", "Bénévoles",         "Gérer les bénévoles"),
         "mecenes":       ("💼", "Mécènes",           "Gérer les mécènes et les dons"),
-        "groupes":       ("💬", "Groupes WhatsApp",  "Transcriptions et infos"),
+        "groupes":       ("💬", "Transcription HOPE", "Messages & vocaux transcrits"),
         "antennes":      ("📍", "Antennes",          "Fiches antennes et responsables"),
         "photos":        ("📷", "Photos",            "Albums et galerie"),
         "newsletter":    ("📰", "Newsletter",        "Envoyer une campagne à tous vos contacts"),
@@ -420,32 +440,6 @@ if "Accueil" in page:
                     if st.button(f"→ {nom}", key=f"btn_{k}_accueil", use_container_width=True):
                         navigate_to(k)
  
-    # ── Graphiques (rôles avec accès complet) ──
-    if role in ["responsable","secretariat"]:
-        st.markdown("<br>", unsafe_allow_html=True)
-        col_a,col_b = st.columns(2)
-        with col_a:
-            st.markdown('<span class="section-title">Bénévoles par type et antenne</span>', unsafe_allow_html=True)
-            df_bv = pd.DataFrame(benevoles_data)
-            fig = px.bar(df_bv.groupby(["Antenne","Type"]).size().reset_index(name="n"),
-                         x="Antenne", y="n", color="Type",
-                         color_discrete_map={"Régulier":"#1a3a6b","Événementiel":"#7c3aed"},
-                         barmode="stack")
-            fig.update_layout(plot_bgcolor="white",paper_bgcolor="white",font=dict(family="DM Sans"),
-                              margin=dict(t=10,b=40,l=10,r=10),height=260,legend=dict(orientation="h",y=-0.35),
-                              xaxis_tickangle=-20)
-            st.plotly_chart(fig, use_container_width=True)
-        with col_b:
-            st.markdown('<span class="section-title">Parcours des bénévoles</span>', unsafe_allow_html=True)
-            df_bv = pd.DataFrame(benevoles_data)
-            parc  = df_bv["Parcours"].value_counts().reset_index()
-            parc.columns = ["Parcours","n"]
-            fig2 = px.pie(parc, values="n", names="Parcours",
-                          color_discrete_sequence=[ROSE,"#1a3a6b"],hole=0.55)
-            fig2.update_layout(margin=dict(t=10,b=10,l=10,r=10),height=260,
-                               font=dict(family="DM Sans"),paper_bgcolor="white")
-            st.plotly_chart(fig2, use_container_width=True)
- 
  
 # ═══════════════════════════════════════════════════════════════════════════════
 # PAGE : BÉNÉFICIAIRES
@@ -464,39 +458,80 @@ elif "Bénéficiaires" in page:
     df_ben = pd.DataFrame(beneficiaires_data).sort_values("Antenne")
     antenne_profil = profil["antenne"]
  
-    col_f1, col_f2, col_f3 = st.columns(3)
+    col_f1, col_f2, col_f3, col_f4 = st.columns(4)
     with col_f1:
         ant_opts = [antenne_profil] if antenne_profil != "Toutes" else ["Toutes les antennes"] + antennes
         ant_sel  = st.selectbox("📍 Antenne", ant_opts)
     with col_f2:
-        sejour_sel = st.selectbox("🏕️ Séjour", ["Tous"] + sorted(df_ben["Séjour"].unique().tolist()))
+        evt_opts = ["Tous les événements"] + sorted(df_ben["Événement"].unique().tolist())
+        evt_sel  = st.selectbox("🎪 Événement", evt_opts)
     with col_f3:
+        sejour_sel = st.selectbox("🏕️ Séjour", ["Tous"] + sorted(df_ben["Séjour"].unique().tolist()))
+    with col_f4:
         pot_sel = st.selectbox("🌱 Statut bénévole potentielle", ["Toutes","Oui","Contactée"])
  
-    if ant_sel != "Toutes les antennes": df_ben = df_ben[df_ben["Antenne"] == ant_sel]
-    if sejour_sel != "Tous":             df_ben = df_ben[df_ben["Séjour"] == sejour_sel]
-    if pot_sel != "Toutes":             df_ben = df_ben[df_ben["Potentielle_benv"] == pot_sel]
+    if ant_sel != "Toutes les antennes":          df_ben = df_ben[df_ben["Antenne"] == ant_sel]
+    if evt_sel != "Tous les événements":           df_ben = df_ben[df_ben["Événement"] == evt_sel]
+    if sejour_sel != "Tous":                       df_ben = df_ben[df_ben["Séjour"] == sejour_sel]
+    if pot_sel != "Toutes":                        df_ben = df_ben[df_ben["Potentielle_benv"] == pot_sel]
+ 
+    # Résumé inscription si filtre événement actif
+    if evt_sel != "Tous les événements":
+        nb_conf = len(df_ben[df_ben["Inscription"]=="Confirmée"])
+        nb_att  = len(df_ben[df_ben["Inscription"]=="En attente"])
+        st.markdown(f"""
+        <div style="background:{BLANC};border-radius:12px;padding:14px 20px;margin-bottom:14px;
+                    display:flex;gap:20px;align-items:center;box-shadow:0 2px 10px rgba(232,24,109,0.07);
+                    border-top:3px solid {ROSE};">
+            <div style="font-size:0.85rem;font-weight:700;color:{NOIR};">📋 {evt_sel}</div>
+            <div style="margin-left:auto;display:flex;gap:12px;">
+                <span style="background:#d4edda;color:#155724;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    ✅ {nb_conf} confirmée(s)
+                </span>
+                <span style="background:#fff3cd;color:#856404;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    ⏳ {nb_att} en attente
+                </span>
+                <span style="background:#f0e8ff;color:#5b21b6;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    👥 {len(df_ben)} total
+                </span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
  
     for ant in df_ben["Antenne"].unique():
         df_a = df_ben[df_ben["Antenne"] == ant]
         st.markdown(f'<div class="ant-section">📍 {ant} ({len(df_a)})</div>', unsafe_allow_html=True)
-        html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Séjour</th><th>Mail</th><th>Potentielle bénévole</th><th>Source</th></tr>'
+        html = f'<table class="data-table"><tr><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Événement</th><th>Séjour</th><th>Mail</th><th>Inscription</th><th>Bénévole potentielle</th><th>Source</th></tr>'
         for _, row in df_a.iterrows():
             mail_cell = row['Mail'] if row['Mail'] else f'<span style="color:{ROSE};font-size:0.8rem;">+ Ajouter</span>'
             if row["Potentielle_benv"] == "Contactée":
                 pot_badge = f'<span style="background:#fef9c3;color:#854d0e;font-size:0.7rem;padding:2px 8px;border-radius:20px;">📩 Contactée</span>'
             else:
                 pot_badge = f'<span class="badge-potentiel">🌱 Oui</span>'
-            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{row["Téléphone"]}</td><td><span class="badge-inscrit">{row["Séjour"]}</span></td><td>{mail_cell}</td><td>{pot_badge}</td><td><span class="badge-wa">📱 WA</span></td></tr>'
+            if row["Inscription"] == "Confirmée":
+                insc_badge = '<span class="badge-actif">✅ Confirmée</span>'
+            else:
+                insc_badge = '<span class="badge-attente">⏳ En attente</span>'
+            html += f'<tr><td>{row["Prénom"]}</td><td>{row["Nom"]}</td><td>{row["Téléphone"]}</td><td style="font-size:0.78rem;color:{GRIS_TEXT};">{row["Événement"]}</td><td><span class="badge-inscrit">{row["Séjour"]}</span></td><td>{mail_cell}</td><td>{insc_badge}</td><td>{pot_badge}</td><td><span class="badge-wa">📱 WA</span></td></tr>'
         html += "</table>"
         st.markdown(html, unsafe_allow_html=True)
  
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(f'<div class="action-card"><div class="action-title">📧 Envoyer une proposition de bénévolat aux potentielles</div></div>', unsafe_allow_html=True)
-    dest_pot = [f"{r['Prénom']} {r['Nom']}" for _, r in df_ben.iterrows() if r['Mail'] and r['Potentielle_benv'] == "Oui"]
-    sel_pot  = st.multiselect("Destinataires (potentielles non encore contactées)", dest_pot, default=dest_pot)
-    if st.button("📤 Envoyer la proposition de bénévolat", type="primary"):
-        st.success(f"✅ Proposition envoyée à {len(sel_pot)} bénéficiaire(s). Leur statut passera à « Contactée ».")
+ 
+    # Actions groupées
+    col_act1, col_act2 = st.columns(2)
+    with col_act1:
+        st.markdown(f'<div class="action-card"><div class="action-title">✅ Valider les inscriptions en attente</div></div>', unsafe_allow_html=True)
+        att_list = [f"{r['Prénom']} {r['Nom']} — {r['Événement']}" for _, r in df_ben.iterrows() if r["Inscription"] == "En attente"]
+        sel_val = st.multiselect("Bénéficiaires à valider", att_list, default=att_list, key="sel_val")
+        if st.button("✅ Valider les inscriptions sélectionnées", type="primary", key="btn_val"):
+            st.success(f"✅ {len(sel_val)} inscription(s) confirmée(s) !")
+    with col_act2:
+        st.markdown(f'<div class="action-card"><div class="action-title">📧 Envoyer une proposition de bénévolat</div></div>', unsafe_allow_html=True)
+        dest_pot = [f"{r['Prénom']} {r['Nom']}" for _, r in df_ben.iterrows() if r['Mail'] and r['Potentielle_benv'] == "Oui"]
+        sel_pot  = st.multiselect("Potentielles non encore contactées", dest_pot, default=dest_pot, key="sel_pot")
+        if st.button("📤 Envoyer la proposition de bénévolat", type="primary", key="btn_benv"):
+            st.success(f"✅ Proposition envoyée à {len(sel_pot)} bénéficiaire(s). Leur statut passera à « Contactée ».")
  
  
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -722,8 +757,8 @@ elif "Newsletter" in page:
 # ═══════════════════════════════════════════════════════════════════════════════
 # PAGE : GROUPES
 # ═══════════════════════════════════════════════════════════════════════════════
-elif "Groupes" in page:
-    st.markdown('<span class="section-title">💬 Groupes Famille HOPE — Administrateurs</span>', unsafe_allow_html=True)
+elif "Transcription" in page:
+    st.markdown('<span class="section-title">💬 Transcription Groupe HOPE — Messages & vocaux</span>', unsafe_allow_html=True)
     groupe_sel=st.selectbox("Groupe",[g["nom"] for g in groupes_wa])
     groupe=next(g for g in groupes_wa if g["nom"]==groupe_sel)
     col_g1,col_g2=st.columns([2,1])
@@ -789,7 +824,7 @@ elif "Antennes" in page:
             ("🧒","Bénéficiaires","Toutes sont bénévoles potentielles. Vous pouvez déclencher une proposition directement."),
             ("👥","Bénévoles","Ajoutez manuellement ou convertissez une bénéficiaire. Distinguez réguliers et événementiels."),
             ("📰","Newsletter","Déposez un PDF et sélectionnez vos destinataires. Envoi automatique."),
-            ("🆘","Support","Contactez Annabelle ou Sandrine via l'Accueil → Responsables des antennes."),
+            ("🆘","Support","Contactez Annabel ou Sandrine via l'Accueil → Responsables des antennes."),
         ]:
             st.markdown(f'<div class="action-card"><div class="action-title">{icon} {titre}</div><div style="font-size:0.85rem;color:{GRIS_TEXT};">{contenu}</div></div>', unsafe_allow_html=True)
  

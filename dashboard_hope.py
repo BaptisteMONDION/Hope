@@ -191,10 +191,11 @@ mecenes_data = [
 ]
  
 classement = [
-    {"rang":"🥇","nom":"Annabel","role":"Responsable",  "init":"AN","heures":47,"bg":"#F4C0D1","txt":"#993556"},
-    {"rang":"🥈","nom":"Gilles",   "role":"Terrain",      "init":"GI","heures":38,"bg":"#9FE1CB","txt":"#0F6E56"},
-    {"rang":"🥉","nom":"Sandrine", "role":"Secrétariat",  "init":"SA","heures":29,"bg":"#B5D4F4","txt":"#185FA5"},
-    {"rang":"4️⃣","nom":"Emeline",  "role":"Événementiel", "init":"EM","heures":21,"bg":"#FAC775","txt":"#854F0B"},
+    {"rang":"🥇","nom":"Sandrine", "role":"Secrétariat",  "init":"SA","heures":312,"bg":"#B5D4F4","txt":"#185FA5"},
+    {"rang":"🥈","nom":"Gilles",   "role":"Terrain",      "init":"GI","heures":287,"bg":"#9FE1CB","txt":"#0F6E56"},
+    {"rang":"🥉","nom":"Annabel","role":"Responsable",  "init":"AN","heures":241,"bg":"#F4C0D1","txt":"#993556"},
+    {"rang":"4️⃣","nom":"Emeline",  "role":"Communication","init":"EM","heures":178,"bg":"#FAC775","txt":"#854F0B"},
+    {"rang":"5️⃣","nom":"Laurence", "role":"Antenne Paris","init":"LA","heures":134,"bg":"#E8D5F5","txt":"#5B2D8E"},
 ]
  
 profils = {
@@ -238,6 +239,96 @@ photos_data = [
     {"titre":"Formation Bénévoles","date":"Mars 2025","antenne":"Marseille – PACA","emoji":"📚","description":"Week-end de formation pour les nouveaux bénévoles Marseille — 28 participants."},
 ]
  
+ 
+ 
+# ─── COMPLÉTION PAR ANTENNE ────────────────────────────────────────────────────
+def calcule_completion(antenne_nom):
+    """Calcule le score de complétion d'une antenne et liste les champs manquants."""
+    manquants = []
+    points_total = 0
+    points_ok = 0
+ 
+    # Bénéficiaires sans mail
+    ben_sans_mail = [r for r in beneficiaires_data if r["Antenne"] == antenne_nom and not r["Mail"]]
+    points_total += 10
+    if ben_sans_mail:
+        manquants.append({"type":"⚠️","msg":f"{len(ben_sans_mail)} bénéficiaire(s) sans adresse mail","cible":"beneficiaires"})
+        points_ok += max(0, 10 - len(ben_sans_mail) * 2)
+    else:
+        points_ok += 10
+ 
+    # Mécènes sans reçu fiscal
+    mec_sans_recu = [r for r in mecenes_data if r["Antenne"] == antenne_nom and r["Reçu envoyé"] == "Non"]
+    points_total += 10
+    if mec_sans_recu:
+        manquants.append({"type":"🧾","msg":f"{len(mec_sans_recu)} reçu(s) fiscal/aux non envoyé(s)","cible":"mecenes"})
+        points_ok += max(0, 10 - len(mec_sans_recu) * 3)
+    else:
+        points_ok += 10
+ 
+    # Bénévoles sans statut défini (Relance ou Inactif)
+    benv_relance = [r for r in benevoles_data if r["Antenne"] == antenne_nom and r["Statut"] in ["Relance","Inactif"]]
+    points_total += 10
+    if benv_relance:
+        manquants.append({"type":"👥","msg":f"{len(benv_relance)} bénévole(s) avec statut à clarifier (Relance/Inactif)","cible":"benevoles"})
+        points_ok += max(0, 10 - len(benv_relance) * 2)
+    else:
+        points_ok += 10
+ 
+    # Inscriptions en attente non validées
+    insc_att = [r for r in beneficiaires_data if r["Antenne"] == antenne_nom and r["Inscription"] == "En attente"]
+    points_total += 10
+    if insc_att:
+        manquants.append({"type":"📋","msg":f"{len(insc_att)} inscription(s) en attente de validation","cible":"beneficiaires"})
+        points_ok += max(0, 10 - len(insc_att) * 2)
+    else:
+        points_ok += 10
+ 
+    # Bénéficiaires potentielles non contactées
+    pot_non_cont = [r for r in beneficiaires_data if r["Antenne"] == antenne_nom and r["Potentielle_benv"] == "Oui" and r["Mail"]]
+    points_total += 10
+    if pot_non_cont:
+        manquants.append({"type":"🌱","msg":f"{len(pot_non_cont)} bénéficiaire(s) potentielle(s) bénévoles non contactée(s)","cible":"beneficiaires"})
+        points_ok += max(0, 10 - len(pot_non_cont) * 2)
+    else:
+        points_ok += 10
+ 
+    score = int(points_ok / points_total * 100) if points_total > 0 else 100
+    return score, manquants
+ 
+def couleur_score(score):
+    if score >= 85: return "#1D9E75", "#d4edda"
+    if score >= 60: return "#BA7517", "#fff3cd"
+    return "#E8186D", "#fde8f0"
+ 
+# ─── DONNÉES RÉCAP ANNUEL PAR PROFIL ──────────────────────────────────────────
+recap_annuel = {
+    "Annabel – Responsable nationale": {
+        "connexions": 241, "beneficiaires_entrees": 34, "benevoles_ajoutes": 12,
+        "messages_lus": 187, "newsletters_envoyees": 3,
+        "stats_asso": {"sejours": 8, "beneficiaires_total": 127, "benevoles_actifs": 25, "dons": "990 000 €", "antennes": 5}
+    },
+    "Gilles – Antenne Lyon": {
+        "connexions": 287, "beneficiaires_entrees": 18, "benevoles_ajoutes": 6,
+        "messages_lus": 143, "newsletters_envoyees": 0,
+        "stats_asso": {"sejours": 8, "beneficiaires_total": 127, "benevoles_actifs": 25, "dons": "990 000 €", "antennes": 5}
+    },
+    "Sandrine – Secrétariat": {
+        "connexions": 312, "beneficiaires_entrees": 27, "benevoles_ajoutes": 9,
+        "messages_lus": 201, "newsletters_envoyees": 3,
+        "stats_asso": {"sejours": 8, "beneficiaires_total": 127, "benevoles_actifs": 25, "dons": "990 000 €", "antennes": 5}
+    },
+    "Emeline – Communication": {
+        "connexions": 178, "beneficiaires_entrees": 2, "benevoles_ajoutes": 0,
+        "messages_lus": 89, "newsletters_envoyees": 3,
+        "stats_asso": {"sejours": 8, "beneficiaires_total": 127, "benevoles_actifs": 25, "dons": "990 000 €", "antennes": 5}
+    },
+    "Laurence – Antenne Paris": {
+        "connexions": 134, "beneficiaires_entrees": 21, "benevoles_ajoutes": 4,
+        "messages_lus": 98, "newsletters_envoyees": 0,
+        "stats_asso": {"sejours": 8, "beneficiaires_total": 127, "benevoles_actifs": 25, "dons": "990 000 €", "antennes": 5}
+    },
+}
  
 # ─── NAVIGATION STATE ──────────────────────────────────────────────────────────
 menu_labels = {
@@ -360,6 +451,109 @@ if "Accueil" in page:
                 <div style="font-size:0.88rem;color:{NOIR};font-weight:500;">⚠️ {item['info']}</div>
             </div>
             """, unsafe_allow_html=True)
+ 
+    st.markdown("<br>", unsafe_allow_html=True)
+ 
+    # ── BILAN ANNUEL — bouton temporaire style "mise à jour événement" ──
+    recap = recap_annuel.get(profil_sel, None)
+    if recap:
+        st.markdown(f"""
+        <div style="background:linear-gradient(90deg,#1A0A00 0%,#2d0f1a 50%,#E8186D 100%);
+                    border-radius:16px;padding:18px 24px;margin-bottom:8px;
+                    display:flex;align-items:center;gap:18px;
+                    box-shadow:0 4px 24px rgba(232,24,109,0.25);
+                    border:1px solid rgba(232,24,109,0.4);
+                    position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;right:0;background:{ROSE};color:white;
+                        font-size:0.6rem;font-weight:700;padding:3px 10px;border-radius:0 16px 0 8px;
+                        letter-spacing:0.1em;text-transform:uppercase;">✨ Édition limitée</div>
+            <div style="font-size:2.5rem;">🏆</div>
+            <div style="flex:1;">
+                <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:white;margin-bottom:3px;">
+                    Votre bilan HOPE 2025
+                </div>
+                <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);">
+                    Découvrez votre récap de l'année — disponible jusqu'au 31 janvier 2025
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("🎁 Voir mon bilan de l'année →", key="btn_bilan", use_container_width=True):
+            st.session_state["show_bilan"] = not st.session_state.get("show_bilan", False)
+ 
+        if st.session_state.get("show_bilan", False):
+            s = recap["stats_asso"]
+            nom_court = profil_sel.split("–")[0].strip()
+            rang_connexions = sorted(recap_annuel.values(), key=lambda x: x["connexions"], reverse=True)
+            mon_rang = next(i+1 for i, v in enumerate(rang_connexions) if v["connexions"] == recap["connexions"])
+ 
+            # Titre
+            st.markdown(f"""
+            <div style="background:{BLANC};border-radius:18px;padding:28px 32px 12px;margin-top:4px;
+                        box-shadow:0 4px 32px rgba(232,24,109,0.12);border-top:4px solid {ROSE};">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="font-size:2.8rem;margin-bottom:6px;">🏆</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:{NOIR};">
+                        {nom_court}, votre année 2025
+                    </div>
+                    <div style="font-size:0.88rem;color:{GRIS_TEXT};margin-top:6px;">
+                        Merci pour votre engagement auprès de HOPE 🐴
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+ 
+            # Tuiles personnelles — row 1
+            c1, c2, c3 = st.columns(3)
+            def kpi_bilan(col, valeur, label, couleur, bg):
+                with col:
+                    st.markdown(f"""
+                    <div style="background:{bg};border-radius:14px;padding:20px;text-align:center;
+                                border-top:3px solid {couleur};margin-bottom:12px;">
+                        <div style="font-family:'Playfair Display',serif;font-size:2.4rem;
+                                    font-weight:900;color:{couleur};line-height:1;">{valeur}</div>
+                        <div style="font-size:0.75rem;color:{GRIS_TEXT};text-transform:uppercase;
+                                    letter-spacing:0.07em;margin-top:6px;">{label}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+ 
+            kpi_bilan(c1, recap["connexions"],           "connexions",           ROSE,     "#fde8f0")
+            kpi_bilan(c2, recap["beneficiaires_entrees"],"bénéficiaires saisies","#1D9E75", "#f0fdf4")
+            kpi_bilan(c3, recap["benevoles_ajoutes"],    "bénévoles ajoutés",    "#1a3a6b", "#f0f4ff")
+ 
+            # Tuiles personnelles — row 2
+            c4, c5, c6 = st.columns(3)
+            kpi_bilan(c4, recap["messages_lus"],         "messages lus",         "#f59e0b", "#fff8e1")
+            kpi_bilan(c5, recap["newsletters_envoyees"], "newsletters envoyées", "#7c3aed", "#f5f0ff")
+            kpi_bilan(c6, f"#{mon_rang}",                "classement connexions", ROSE,     "#fde8f0")
+ 
+            # Bloc global asso
+            st.markdown(f"""
+            <div style="background:linear-gradient(90deg,{NOIR} 0%,#2d0f1a 100%);
+                        border-radius:14px;padding:20px 24px;margin-bottom:4px;">
+                <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+                            color:white;margin-bottom:14px;">🌍 HOPE en 2024 — l'association au global</div>
+            </div>
+            """, unsafe_allow_html=True)
+ 
+            g1, g2, g3, g4, g5 = st.columns(5)
+            def kpi_global(col, valeur, label):
+                with col:
+                    st.markdown(f"""
+                    <div style="background:#1a0a10;border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
+                        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;
+                                    font-weight:900;color:{ROSE};">{valeur}</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);margin-top:4px;">{label}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+ 
+            kpi_global(g1, s["sejours"],            "séjours organisés")
+            kpi_global(g2, s["beneficiaires_total"],"bénéficiaires accompagnées")
+            kpi_global(g3, s["benevoles_actifs"],   "bénévoles actifs")
+            kpi_global(g4, s["dons"],               "collectés en dons")
+            kpi_global(g5, s["antennes"],           "antennes actives")
+ 
+            st.markdown("<br>", unsafe_allow_html=True)
  
     st.markdown("<br>", unsafe_allow_html=True)
  
@@ -784,6 +978,47 @@ elif "Antennes" in page:
     st.markdown('<span class="section-title">📍 Espace Antennes</span>', unsafe_allow_html=True)
     tab_a1,tab_a2=st.tabs(["🗺️ Nos antennes","📋 Guide Antenne"])
     with tab_a1:
+        # ── Barres de complétion par antenne ──
+        st.markdown('<span class="section-title" style="font-size:1.1rem;">🎯 Complétion des antennes</span>', unsafe_allow_html=True)
+        ant_profil_filtre = profil["antenne"]
+        antennes_a_afficher = antennes if ant_profil_filtre == "Toutes" else [ant_profil_filtre]
+ 
+        def render_completion_card(ant_nom):
+            ant_info = next((a for a in antennes_data if a["nom"] == ant_nom), None)
+            score, manquants = calcule_completion(ant_nom)
+            couleur_txt, couleur_bg = couleur_score(score)
+            emoji = ant_info["emoji"] if ant_info else "📍"
+            ant_court = ant_nom.split("–")[0].strip()
+            card_html = f"""
+            <div style="background:{BLANC};border-radius:14px;padding:18px 20px;margin-bottom:12px;
+                        box-shadow:0 2px 12px rgba(232,24,109,0.07);border-top:4px solid {couleur_txt};">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div style="font-weight:700;font-size:0.95rem;color:{NOIR};">{emoji} {ant_court}</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:{couleur_txt};">{score}%</div>
+                </div>
+                <div style="background:#f0e8ec;border-radius:8px;height:10px;margin-bottom:12px;overflow:hidden;">
+                    <div style="width:{score}%;height:10px;background:linear-gradient(90deg,{couleur_txt},{ROSE_LIGHT});border-radius:8px;"></div>
+                </div>
+            """
+            if manquants:
+                card_html += f'<div style="font-size:0.75rem;color:{GRIS_TEXT};font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">À compléter :</div>'
+                for m in manquants:
+                    card_html += f'<div style="font-size:0.8rem;color:{NOIR};padding:4px 0;border-bottom:1px solid #f5eff2;">{m["type"]} {m["msg"]}</div>'
+            else:
+                card_html += f'<div style="font-size:0.82rem;color:#1D9E75;font-weight:600;">✅ Antenne complète !</div>'
+            card_html += "</div>"
+            st.markdown(card_html, unsafe_allow_html=True)
+ 
+        if len(antennes_a_afficher) == 1:
+            render_completion_card(antennes_a_afficher[0])
+        else:
+            col_g1, col_g2 = st.columns(2)
+            for idx, ant_nom in enumerate(antennes_a_afficher):
+                with (col_g1 if idx % 2 == 0 else col_g2):
+                    render_completion_card(ant_nom)
+ 
+        st.markdown("<br>", unsafe_allow_html=True)
+ 
         # ── Tableau des responsables ──
         st.markdown('<span class="section-title" style="font-size:1.1rem;">📞 Responsables d\'antenne</span>', unsafe_allow_html=True)
         ant_profil_filtre = profil["antenne"]
